@@ -21,8 +21,8 @@ Best configuration so far: a=4.0, b=2.0, g=0.4, p=0.01
 Requires Python 3.10+. The library itself needs only NumPy.
 
 ```bash
-git clone https://github.com/<user>/T4exps.git
-cd T4exps
+git clone https://github.com/rilianx/T4exps_clean.git
+cd T4exps_clean
 pip install -e .
 ```
 
