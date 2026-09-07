@@ -1,0 +1,33 @@
+{
+ "output": [
+  4.0,
+  2.0,
+  0.3,
+  0.01
+ ],
+ "likelihood": 1.0,
+ "runs": 235,
+ "sequential_runs": 21000,
+ "speedup": 89.36170212765957,
+ "hits": 235,
+ "misses": 0,
+ "confidence": 0.98,
+ "tolerance": 0.0116,
+ "nsims": 400,
+ "oracle": "runs/oracle_extended.csv",
+ "honest": false,
+ "impute": false,
+ "estimator": "paired",
+ "history": [
+  [
+   210,
+   0.9151515151515152,
+   17
+  ],
+  [
+   235,
+   1.0,
+   17
+  ]
+ ]
+}

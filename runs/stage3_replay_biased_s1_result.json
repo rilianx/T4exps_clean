@@ -1,0 +1,36 @@
+{
+ "output": [
+  4.0,
+  2.0,
+  0.3,
+  0.01
+ ],
+ "likelihood": 1.0,
+ "runs": 260,
+ "sequential_runs": 21000,
+ "speedup": 80.76923076923077,
+ "hits": 260,
+ "misses": 0,
+ "confidence": 0.98,
+ "tolerance": 0.0116,
+ "nsims": 400,
+ "oracle": "/home/iaraya/sepeculative_experiments/T4exps_clean/runs/stage3_exact_evals.csv",
+ "honest": false,
+ "history": [
+  [
+   210,
+   0.9,
+   17
+  ],
+  [
+   235,
+   0.8679245283018868,
+   17
+  ],
+  [
+   260,
+   1.0,
+   10
+  ]
+ ]
+}

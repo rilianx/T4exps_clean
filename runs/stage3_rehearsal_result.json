@@ -1,0 +1,20 @@
+{
+  "output": [
+    4.0,
+    2.0,
+    0.3,
+    0.01
+  ],
+  "likelihood": 1.0,
+  "runs": 260,
+  "sequential_runs": 2800,
+  "wasted_runs": -2540,
+  "speedup": 10.76923076923077,
+  "wall_hours": 0.3084255667527517,
+  "n_instances": 200,
+  "solver_time": 30,
+  "timeout": 75.0,
+  "confidence": 0.98,
+  "tolerance": 0.0316,
+  "cost_aware": false
+}

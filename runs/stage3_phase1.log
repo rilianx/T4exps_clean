@@ -1,0 +1,16 @@
+==============================================================================
+ETAPA 3 [phase1]  1500 instancias  T=30s  timeout=75.0s  jobs=8
+  confidence=0.98  tolerance=0.0116  cost_aware=False
+==============================================================================
+[   210 runs] L=89.5% depth=17 -> <bsg a=4.0, b=2.0, g=0.1, p=0.01> (I=1.00)
+[   235 runs] L=91.7% depth=17 -> <bsg a=4.0, b=0.5, g=0.1, p=0.01> (I=1.00)
+[   260 runs] L=99.0% depth=17 -> <bsg a=4.0, b=2.0, g=0.1, p=0.01> (I=1.00)
+
+(4.0, 2.0, 0.3, 0.01)  (likelihood 99%, 260 runs vs 21000 sequential, -20740 wasted)
+  runs            = 260
+  sequential_runs = 21000
+  speedup         = 80.77x
+  likelihood      = 0.9900
+  wasted_runs     = -20740
+  wall            = 0.31 h
+  log -> /home/iaraya/sepeculative_experiments/T4exps_clean/runs/stage3_phase1_history.csv

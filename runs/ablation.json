@@ -1,0 +1,632 @@
+[
+ {
+  "tag": "b_k2_s0",
+  "denominador": "sesgado",
+  "estimador": "paired_k2",
+  "seed": 0,
+  "runs": 285,
+  "speedup": 73.68,
+  "L": 0.9839,
+  "output": [
+   4.0,
+   2.0,
+   0.3,
+   0.01
+  ],
+  "correcto": false,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "biased_s1",
+  "denominador": "sesgado",
+  "estimador": "paired",
+  "seed": 1,
+  "runs": 260,
+  "speedup": 80.77,
+  "L": 1.0,
+  "output": [
+   4.0,
+   2.0,
+   0.3,
+   0.01
+  ],
+  "correcto": false,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "biased_s2",
+  "denominador": "sesgado",
+  "estimador": "paired",
+  "seed": 2,
+  "runs": 235,
+  "speedup": 89.36,
+  "L": 1.0,
+  "output": [
+   4.0,
+   2.0,
+   0.3,
+   0.01
+  ],
+  "correcto": false,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "biased_s3",
+  "denominador": "sesgado",
+  "estimador": "paired",
+  "seed": 3,
+  "runs": 3195,
+  "speedup": 6.57,
+  "L": 1.0,
+  "output": [
+   4.0,
+   2.0,
+   0.3,
+   0.01
+  ],
+  "correcto": false,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "h_k2_s0",
+  "denominador": "honesto",
+  "estimador": "paired_k2",
+  "seed": 0,
+  "runs": 10795,
+  "speedup": 1.95,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "h_k2_s1",
+  "denominador": "honesto",
+  "estimador": "paired_k2",
+  "seed": 1,
+  "runs": 13580,
+  "speedup": 1.55,
+  "L": 0.9825,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "h_k2_s2",
+  "denominador": "honesto",
+  "estimador": "paired_k2",
+  "seed": 2,
+  "runs": 14365,
+  "speedup": 1.46,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "h_k2_s3",
+  "denominador": "honesto",
+  "estimador": "paired_k2",
+  "seed": 3,
+  "runs": 14715,
+  "speedup": 1.43,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "h_k3_s0",
+  "denominador": "honesto",
+  "estimador": "paired_k3",
+  "seed": 0,
+  "runs": 15525,
+  "speedup": 1.35,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "honest",
+  "denominador": "honesto",
+  "estimador": "paired",
+  "seed": 0,
+  "runs": 12945,
+  "speedup": 1.62,
+  "L": 0.9825,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "honest_s1",
+  "denominador": "honesto",
+  "estimador": "paired",
+  "seed": 1,
+  "runs": 14315,
+  "speedup": 1.47,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "honest_s2",
+  "denominador": "honesto",
+  "estimador": "paired",
+  "seed": 2,
+  "runs": 1410,
+  "speedup": 14.89,
+  "L": 1.0,
+  "output": [
+   4.0,
+   2.0,
+   0.3,
+   0.01
+  ],
+  "correcto": false,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "honest_s3",
+  "denominador": "honesto",
+  "estimador": "paired",
+  "seed": 3,
+  "runs": 1410,
+  "speedup": 14.89,
+  "L": 1.0,
+  "output": [
+   4.0,
+   2.0,
+   0.3,
+   0.01
+  ],
+  "correcto": false,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "imp_k3_solver_s0",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 0,
+  "runs": 6745,
+  "speedup": 3.11,
+  "L": 0.9825,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 115,
+  "solver_real": true
+ },
+ {
+  "tag": "imp_k3_solver_s1",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 1,
+  "runs": 7245,
+  "speedup": 2.9,
+  "L": 0.9825,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 115,
+  "solver_real": true
+ },
+ {
+  "tag": "imp_k3_solver_s2",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 2,
+  "runs": 6870,
+  "speedup": 3.06,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 115,
+  "solver_real": true
+ },
+ {
+  "tag": "p1",
+  "denominador": "sesgado",
+  "estimador": "paired",
+  "seed": 0,
+  "runs": 3570,
+  "speedup": 5.88,
+  "L": 1.0,
+  "output": [
+   4.0,
+   2.0,
+   0.3,
+   0.01
+  ],
+  "correcto": false,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s10",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 10,
+  "runs": 6370,
+  "speedup": 3.3,
+  "L": 0.9875,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s11",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 11,
+  "runs": 7420,
+  "speedup": 2.83,
+  "L": 0.985,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s13",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 13,
+  "runs": 7120,
+  "speedup": 2.95,
+  "L": 0.9825,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s14",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 14,
+  "runs": 8120,
+  "speedup": 2.59,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s15",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 15,
+  "runs": 6320,
+  "speedup": 3.32,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s16",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 16,
+  "runs": 6895,
+  "speedup": 3.05,
+  "L": 0.9925,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s17",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 17,
+  "runs": 6745,
+  "speedup": 3.11,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s18",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 18,
+  "runs": 6770,
+  "speedup": 3.1,
+  "L": 0.9825,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s19",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 19,
+  "runs": 6645,
+  "speedup": 3.16,
+  "L": 0.9825,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s20",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 20,
+  "runs": 6720,
+  "speedup": 3.12,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s21",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 21,
+  "runs": 7095,
+  "speedup": 2.96,
+  "L": 0.985,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s24",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 24,
+  "runs": 6745,
+  "speedup": 3.11,
+  "L": 0.9825,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s26",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 26,
+  "runs": 6370,
+  "speedup": 3.3,
+  "L": 0.99,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s27",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 27,
+  "runs": 7320,
+  "speedup": 2.87,
+  "L": 0.985,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s28",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 28,
+  "runs": 7120,
+  "speedup": 2.95,
+  "L": 0.99,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "var_imp_s29",
+  "denominador": "imputa",
+  "estimador": "paired_k3",
+  "seed": 29,
+  "runs": 7045,
+  "speedup": 2.98,
+  "L": 0.98,
+  "output": [
+   4.0,
+   2.0,
+   0.4,
+   0.01
+  ],
+  "correcto": true,
+  "misses": 0,
+  "solver_real": false
+ },
+ {
+  "tag": "fase1_real",
+  "denominador": "sesgado",
+  "estimador": "paired",
+  "seed": 0,
+  "runs": 260,
+  "speedup": 80.77,
+  "L": 0.99,
+  "output": [
+   4.0,
+   2.0,
+   0.3,
+   0.01
+  ],
+  "correcto": false,
+  "misses": 0,
+  "solver_real": true
+ },
+ {
+  "tag": "exacto_intento1",
+  "denominador": "sesgado",
+  "estimador": "paired",
+  "seed": 0,
+  "runs": 3570,
+  "speedup": 5.88,
+  "L": 1.0,
+  "output": [
+   4.0,
+   2.0,
+   0.3,
+   0.01
+  ],
+  "correcto": false,
+  "misses": 0,
+  "solver_real": true
+ }
+]

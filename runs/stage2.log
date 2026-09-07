@@ -1,0 +1,12 @@
+==============================================================================
+ETAPA 2 -- matriz completa  5 x 200 = 1000 ejecuciones   T=30s timeout=75.0s jobs=8
+estimado: 72 min de reloj
+==============================================================================
+[1/5] alpha=0.0  n=200 media=94.9064 sd=1.0381 min=92.30 max=97.40  wall=773s  (773s total)
+[2/5] alpha=1.0  n=200 media=95.2749 sd=0.8848 min=92.59 max=97.23  wall=773s  (1545s total)
+[3/5] alpha=2.0  n=200 media=95.4466 sd=0.8604 min=92.76 max=97.64  wall=773s  (2318s total)
+[4/5] alpha=4.0  n=200 media=95.4516 sd=0.8440 min=92.70 max=97.70  wall=773s  (3091s total)
+[5/5] alpha=8.0  n=200 media=95.3037 sd=0.9154 min=92.48 max=97.25  wall=772s  (3863s total)
+
+guardado /home/iaraya/sepeculative_experiments/T4exps_clean/runs/stage2_evals.npz  Y.shape=(5, 200)
+errores: 0

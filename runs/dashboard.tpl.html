@@ -1,0 +1,1144 @@
+<title>Trayectoria BSG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#eef1f4; --surface:#f9fafb; --sunk:#e4e9ee;
+  --ink:#0d1418; --ink-2:#4b5a66; --ink-3:#7f8f9b;
+  --rule:#d3dbe1; --rule-soft:#e2e8ed;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --live:#1baf7a;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0e1216; --surface:#171d23; --sunk:#11161b;
+  --ink:#e9eff4; --ink-2:#9fb0bc; --ink-3:#6b7b88;
+  --rule:#28313a; --rule-soft:#1e262d;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --live:#199e70;
+}}
+:root[data-theme="dark"]{
+  --ground:#0e1216; --surface:#171d23; --sunk:#11161b;
+  --ink:#e9eff4; --ink-2:#9fb0bc; --ink-3:#6b7b88;
+  --rule:#28313a; --rule-soft:#1e262d;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --live:#199e70;
+}
+
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1060px;margin:0 auto;padding:40px 24px 88px;
+  display:flex;flex-direction:column;gap:44px}
+
+/* --- typography ------------------------------------------------------- */
+h1{font-size:34px;line-height:1.15;font-weight:600;letter-spacing:-.02em;
+  margin:0;text-wrap:balance}
+h2{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:0;text-wrap:balance}
+p{margin:0;max-width:66ch;color:var(--ink-2)}
+p strong{color:var(--ink);font-weight:600}
+.eyebrow{font-family:var(--mono);font-size:11px;font-weight:500;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+code{font-family:var(--mono);font-size:.9em;background:var(--sunk);
+  padding:1px 5px;border-radius:3px;color:var(--ink)}
+
+header{display:flex;flex-direction:column;gap:14px;
+  padding-bottom:32px;border-bottom:1px solid var(--rule)}
+.stamp{font-family:var(--mono);font-size:12px;color:var(--ink-3);
+  display:flex;flex-wrap:wrap;gap:6px 18px}
+
+section{display:flex;flex-direction:column;gap:18px}
+.head{display:flex;flex-direction:column;gap:8px}
+
+/* --- live strip ------------------------------------------------------- */
+.live{background:var(--surface);border:1px solid var(--rule);border-radius:8px;
+  padding:20px 22px;display:flex;flex-direction:column;gap:16px}
+.live-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--live);
+  flex:none;align-self:center}
+@media (prefers-reduced-motion:no-preference){
+  .dot{animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+}
+.live-title{font-weight:600;font-size:15px}
+.live-sub{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:2px;background:var(--rule-soft);border-radius:6px;overflow:hidden}
+.cell{background:var(--surface);padding:12px 14px;display:flex;
+  flex-direction:column;gap:3px}
+.cell .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3)}
+.cell .v{font-family:var(--mono);font-size:19px;font-weight:500;
+  font-variant-numeric:tabular-nums;color:var(--ink);line-height:1.25}
+.cell .v small{font-size:12px;color:var(--ink-3);font-weight:400}
+
+/* --- charts ----------------------------------------------------------- */
+figure{margin:0;display:flex;flex-direction:column;gap:12px}
+.plot{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);
+  border-radius:8px;padding:14px 6px 6px}
+svg{display:block;min-width:520px;width:100%;height:auto;overflow:visible}
+.grid{stroke:var(--rule-soft);stroke-width:1}
+.axis{stroke:var(--rule);stroke-width:1}
+.tick{font-family:var(--mono);font-size:10.5px;fill:var(--ink-3);
+  font-variant-numeric:tabular-nums}
+.axname{font-family:var(--mono);font-size:10.5px;fill:var(--ink-3);
+  letter-spacing:.08em;text-transform:uppercase}
+.dlabel{font-family:var(--mono);font-size:11.5px;font-weight:500;fill:var(--ink)}
+.note{font-family:var(--mono);font-size:11px;fill:var(--ink-3)}
+figcaption{font-size:13.5px;color:var(--ink-3);max-width:74ch}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px 20px;align-items:center}
+.lg{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2)}
+.lg i{width:14px;height:3px;border-radius:2px;flex:none;display:block}
+
+.tip{position:absolute;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:var(--ink);color:var(--ground);border-radius:5px;padding:7px 10px;
+  font-family:var(--mono);font-size:11.5px;line-height:1.5;white-space:nowrap;
+  z-index:20;transform:translate(-50%,-118%);font-variant-numeric:tabular-nums}
+.tip b{font-weight:600}
+.plot-host{position:relative}
+
+/* --- tables ----------------------------------------------------------- */
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:8px;
+  background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--rule-soft)}
+thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:500;
+  background:var(--sunk);border-bottom:1px solid var(--rule)}
+tbody tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right;font-family:var(--mono);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.tie td{background:color-mix(in srgb,var(--s2) 9%,transparent)}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;
+  padding:2px 7px;border-radius:99px;border:1px solid var(--rule);
+  color:var(--ink-2);white-space:nowrap}
+.tag.ok{border-color:var(--s3);color:var(--s3)}
+.tag.now{border-color:var(--s1);color:var(--s1)}
+
+details{border-top:1px solid var(--rule-soft);padding-top:14px}
+summary{cursor:pointer;font-family:var(--mono);font-size:12px;
+  color:var(--ink-3);letter-spacing:.05em}
+summary:focus-visible{outline:2px solid var(--s1);outline-offset:3px;border-radius:3px}
+details[open] summary{margin-bottom:14px}
+
+footer{border-top:1px solid var(--rule);padding-top:24px;
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:1.8}
+.dot.warn{background:var(--s2)}
+.dot.off{background:var(--ink-3);animation:none}
+</style>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">BSG-CLP · afinado de parámetros con ejecución especulativa</p>
+  <h1>Trayectoria de likelihood</h1>
+  <p>Cuántas ejecuciones del solver hacen falta antes de que el motor esté seguro
+     de qué configuración gana. La respuesta que se busca no es el óptimo — es el
+     <strong>ahorro</strong>: cuánto del barrido secuencial se puede no correr.</p>
+  <div class="stamp" id="stamp"></div>
+</header>
+
+<!-- ===================== LIVE ===================== -->
+<section>
+  <div class="live">
+    <div class="live-top">
+      <span class="dot" id="dot" aria-hidden="true"></span>
+      <span class="live-title" id="live-title">Etapa 3 · fase 1 — 1500 instancias</span>
+      <span class="live-sub" id="live-sub"></span>
+    </div>
+    <div class="readout" id="readout"></div>
+    <p style="font-size:13px;margin:0" id="live-note"></p>
+  </div>
+</section>
+
+<!-- ===================== TRAYECTORIA ===================== -->
+<section>
+  <div class="head">
+    <p class="eyebrow">La figura que falta en la sección 5.2</p>
+    <h2>Likelihood contra ejecuciones</h2>
+    <p>Cada punto es una re-ejecución del experimento contra los datos
+       acumulados hasta ahí. El motor para cuando la likelihood cruza el umbral
+       de confianza, o cuando ya no queda nada por evaluar en el camino.</p>
+  </div>
+  <figure>
+    <div class="legend" id="lg-traj"></div>
+    <div class="plot"><div class="plot-host">
+      <svg id="c-traj" viewBox="0 0 980 340" role="img"
+           aria-label="Likelihood contra número de ejecuciones, tres corridas"></svg>
+      <div class="tip" id="tip-traj"></div>
+    </div></div>
+    <figcaption id="cap-traj"></figcaption>
+  </figure>
+  <details>
+    <summary>Ver los datos</summary>
+    <div class="tablewrap"><table id="t-traj">
+      <thead><tr><th>corrida</th><th class="n">ejecuciones</th>
+        <th class="n">likelihood</th><th class="n">profundidad</th></tr></thead>
+      <tbody></tbody></table></div>
+  </details>
+</section>
+
+<!-- ===================== CONVERGENCIA ===================== -->
+<section id="sec-conv">
+  <div class="head">
+    <p class="eyebrow">Fase exacta · 1500 instancias · umbral desactivado</p>
+    <h2>Convergencia de la likelihood</h2>
+    <p>La corrida completa, sin corte por confianza, para ver a dónde converge
+       la likelihood cuando se la deja llegar hasta el final. No es monótona:
+       <strong>se derrumba a cero durante unas 6000 evaluaciones</strong> y
+       después vuelve.</p>
+  </div>
+  <figure>
+    <div class="legend" id="lg-conv"></div>
+    <div class="plot"><div class="plot-host">
+      <svg id="c-conv" viewBox="0 0 980 400" role="img"
+           aria-label="Likelihood contra ejecuciones a lo largo de la corrida completa"></svg>
+      <div class="tip" id="tip-conv"></div>
+    </div></div>
+    <figcaption id="cap-conv"></figcaption>
+  </figure>
+</section>
+
+<!-- ===================== VARIABILIDAD ===================== -->
+<section id="sec-var">
+  <div class="head">
+    <p class="eyebrow">Motor con los cuatro arreglos · muchas semillas · runs/build_variability.py</p>
+    <h2>Variabilidad de la convergencia</h2>
+    <p>La misma matriz, la misma regla, distinta semilla del Monte Carlo. Cada
+       trayectoria es una corrida completa del motor arreglado (denominador
+       honesto + imputación + <code>paired_k3</code>) contra el oráculo; la banda
+       es el rango 10–90% de la likelihood entre las corridas que siguen vivas en
+       cada punto, y cada marca es dónde paró una semilla y con qué respuesta.</p>
+  </div>
+  <div class="readout" id="ro-var"></div>
+  <figure>
+    <div class="legend" id="lg-var"></div>
+    <div class="plot"><div class="plot-host">
+      <svg id="c-var" viewBox="0 0 980 400" role="img"
+           aria-label="Banda de cuantiles de la likelihood y puntos de parada por semilla"></svg>
+      <div class="tip" id="tip-var"></div>
+    </div></div>
+    <figcaption id="cap-var"></figcaption>
+  </figure>
+</section>
+
+<!-- ===================== ABLACION ===================== -->
+<section id="sec-ablation">
+  <div class="head">
+    <p class="eyebrow">Replays contra la matriz completa · runs/replay.py</p>
+    <h2>Qué arregla cada arreglo</h2>
+    <p>Con la matriz de 21 000 evaluaciones como oráculo, cada variante del motor
+       se re-juega en minutos sin tocar el solver: mismos datos, distinta
+       regla. Filas por celda del 2×2 <em>denominador × estimador</em>, con
+       semillas. <strong>El speedup grande sólo aparece en las celdas que se
+       equivocan.</strong></p>
+  </div>
+  <div class="tablewrap"><table id="t-ablation">
+    <thead><tr><th>denominador</th><th>estimador</th><th class="n">semilla</th>
+      <th class="n">paró en</th><th class="n">speedup</th><th class="n">L al parar</th>
+      <th>output</th><th>¿correcto?</th></tr></thead>
+    <tbody></tbody></table></div>
+  <p id="cap-ablation" style="font-size:13.5px;color:var(--ink-3);max-width:74ch"></p>
+</section>
+
+<!-- ===================== LIKELIHOOD HONESTA ===================== -->
+<section id="sec-honest">
+  <div class="head">
+    <p class="eyebrow">Diagnóstico · runs/annotate_trajectory.py</p>
+    <h2>Lo que la likelihood no dice</h2>
+    <p>La likelihood es <code>aciertos / simulaciones&nbsp;completadas</code>, y las
+       que abortan se descartan. Una simulación aborta cuando su camino necesita
+       una estrategia sin datos — o sea <strong>cuando discrepa con la
+       predicción</strong>. El denominador está correlacionado con el acuerdo, así
+       que la cifra está sesgada hacia arriba, y el sesgo crece con la tasa de
+       aborto.</p>
+  </div>
+  <figure>
+    <div class="legend" id="lg-honest"></div>
+    <div class="plot"><div class="plot-host">
+      <svg id="c-honest" viewBox="0 0 980 320" role="img"
+           aria-label="Likelihood reportada contra likelihood con denominador completo"></svg>
+      <div class="tip" id="tip-honest"></div>
+    </div></div>
+    <figcaption>Misma evidencia, dos denominadores. La serie reportada se mueve
+      sobre todo porque se mueve el denominador, no porque cambie lo que se
+      sabe.</figcaption>
+  </figure>
+  <figure>
+    <div class="plot"><div class="plot-host">
+      <svg id="c-alive" viewBox="0 0 980 200" role="img"
+           aria-label="Simulaciones que sobreviven, de 400"></svg>
+      <div class="tip" id="tip-alive"></div>
+    </div></div>
+    <figcaption>De 400 simulaciones por punto. El motor se vuelve <em>menos</em>
+      capaz de simular a medida que junta datos, porque los caminos alternativos
+      llevan a estrategias que nunca evaluó.</figcaption>
+  </figure>
+  <div class="tablewrap"><table id="t-honest">
+    <thead><tr><th>corrida</th><th class="n">ejecuciones</th>
+      <th class="n">vivas / 400</th><th class="n">aciertos</th>
+      <th class="n">L reportada</th><th class="n">L honesta</th></tr></thead>
+    <tbody></tbody></table></div>
+</section>
+
+<!-- ===================== ALPHA ===================== -->
+<section>
+  <div class="head">
+    <p class="eyebrow">Etapa 2 · 5 configuraciones × 200 instancias</p>
+    <h2>El óptimo es una meseta</h2>
+    <p>Utilización de volumen alcanzada, en puntos porcentuales, con barras de
+       ±1 error estándar <em>pareado</em>. <strong>α=2.0 y α=4.0 están separados
+       por 0.2 SE</strong>: son indistinguibles. El argmax dentro de la meseta es
+       arbitrario, y ese es el resultado — no un defecto del método.</p>
+  </div>
+  <figure>
+    <div class="plot"><div class="plot-host">
+      <svg id="c-alpha" viewBox="0 0 980 330" role="img"
+           aria-label="Media de utilización por valor de alpha, con error estándar pareado"></svg>
+      <div class="tip" id="tip-alpha"></div>
+    </div></div>
+    <figcaption>La barra de error es el SE de la <em>diferencia</em> pareada de
+      medias, que es la escala contra la que el motor decide — no la desviación
+      marginal, que es 28 veces más grande.</figcaption>
+  </figure>
+  <div class="tablewrap"><table id="t-alpha">
+    <thead><tr><th class="n">α</th><th class="n">media (pp)</th>
+      <th class="n">sd marginal</th><th class="n">Δ vs anterior</th>
+      <th class="n">en SE</th><th>lectura</th></tr></thead>
+    <tbody></tbody></table></div>
+</section>
+
+<!-- ===================== VARIANZA ===================== -->
+<section>
+  <div class="head">
+    <p class="eyebrow">Etapa 2 · análisis 1 y 3</p>
+    <h2>De dónde sale la precisión</h2>
+    <p>El modelo aditivo de dos vías reparte la varianza en efecto de instancia,
+       efecto de configuración y residuo. El <strong>efecto de instancia es la
+       varianza que el estimador pareado cancela entera</strong> y el
+       independiente paga entera.</p>
+  </div>
+  <figure>
+    <div class="plot"><div class="plot-host">
+      <svg id="c-var" viewBox="0 0 980 180" role="img"
+           aria-label="Descomposición de varianza en efecto de instancia, residuo y efecto de configuración"></svg>
+      <div class="tip" id="tip-var"></div>
+    </div></div>
+    <figcaption>Con corrección de sesgo. Sin ella daría 0.828 — casi lo mismo en
+      este régimen, pero la validación sintética del plan mostró 0.182 contra
+      0.002 en el régimen adverso, que es justo el que hay que poder detectar.</figcaption>
+  </figure>
+  <div class="readout" id="ro-prec"></div>
+</section>
+
+<!-- ===================== COSTO ===================== -->
+<section>
+  <div class="head">
+    <p class="eyebrow">Etapa 2 · análisis 4 — 1000 ejecuciones</p>
+    <h2>Todas las instancias cuestan lo mismo</h2>
+    <p>Con <code>-t 30</code> vinculante el costo por ejecución no depende de la
+       familia: el rango entre BR1 y BR14 es de <strong>1.05×</strong>. Por eso
+       <code>cost_aware</code> queda en <code>False</code> — dividir por un costo
+       constante no compra nada y agrega ruido.</p>
+  </div>
+  <figure>
+    <div class="plot"><div class="plot-host">
+      <svg id="c-cost" viewBox="0 0 980 300" role="img"
+           aria-label="Segundos por ejecución, mediana y máximo, por familia BR1 a BR15"></svg>
+      <div class="tip" id="tip-cost"></div>
+    </div></div>
+    <figcaption>El <code>timeout</code> del harness está en 75 s, muy afuera de
+      este gráfico: 2.25× el peor exceso observado. El límite de tiempo lo
+      administra el solver por <code>-t</code>, no el harness.</figcaption>
+  </figure>
+</section>
+
+<!-- ===================== DECISIONES ===================== -->
+<section>
+  <div class="head">
+    <p class="eyebrow">Lo que la Etapa 2 le entrega a la Etapa 3</p>
+    <h2>Los cuatro parámetros, decididos</h2>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>parámetro</th><th class="n">valor</th><th>de dónde sale</th></tr></thead>
+    <tbody>
+      <tr><td><code>estimator</code></td><td class="n">paired</td>
+        <td>frac_inst = 0.824 y ρ mínimo = 0.838 entre configuraciones</td></tr>
+      <tr><td><code>tolerance</code></td><td class="n">0.0116</td>
+        <td>sd de la diferencia pareada (0.4476 pp) sobre √1500 — reescalada
+            desde el 0.0316 de N=200</td></tr>
+      <tr><td><code>cost_aware</code></td><td class="n">False</td>
+        <td>dispersión de costo entre familias de 1.05×</td></tr>
+      <tr><td><code>timeout</code></td><td class="n">75 s</td>
+        <td>peor wall observado 33.27 s en 1000 ejecuciones; red de seguridad,
+            no mecanismo de corte</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer id="foot"></footer>
+</div>
+
+<script>
+const DATA = __DATA__;
+
+/* ---------- helpers ---------- */
+const SVG = "http://www.w3.org/2000/svg";
+const el = (n, a = {}) => { const e = document.createElementNS(SVG, n);
+  for (const k in a) e.setAttribute(k, a[k]); return e; };
+const fmt = (x, d = 2) => x.toFixed(d);
+const C = { s1: "var(--s1)", s2: "var(--s2)", s3: "var(--s3)" };
+
+function tipFor(host, tip) {
+  return {
+    show(evt, html) {
+      tip.innerHTML = html;
+      const r = host.getBoundingClientRect();
+      tip.style.left = (evt.clientX - r.left) + "px";
+      tip.style.top = (evt.clientY - r.top) + "px";
+      tip.style.opacity = 1;
+    },
+    hide() { tip.style.opacity = 0; }
+  };
+}
+
+/* ---------- 0. stamp + readout ---------- */
+(function () {
+  const p = DATA.phase1;
+  document.getElementById("stamp").innerHTML =
+    `<span>instantánea ${DATA.stamp}</span>` +
+    `<span>benchmark BR1–BR15 · 1500 instancias</span>` +
+    `<span>Xeon E5-2620 v4 · 8 jobs</span>`;
+  document.getElementById("live-sub").textContent =
+    `confidence 0.98 · tolerance 0.0116 · −t 30 s`;
+  const res = DATA.result;
+  const mins = Math.round(p.elapsed / 60);
+  const cells = res ? [
+    ["ejecuciones", res.runs, ""],
+    ["secuencial serían", res.sequential_runs.toLocaleString("es"), ""],
+    ["likelihood", (res.likelihood * 100).toFixed(1), "%"],
+    ["estrategias", p.strategies, ""],
+    ["reloj", mins, "min"],
+    ["errores", p.errors, ""],
+  ] : [
+    ["ejecuciones", p.n, ""],
+    ["errores", p.errors, ""],
+    ["transcurrido", mins, "min"],
+    ["estrategias vistas", p.strategies, ""],
+    ["s por ejecución", fmt(p.mean_sec, 1), "s"],
+    ["secuencial serían", "21 000", ""],
+  ];
+  if (res) {
+    document.getElementById("dot").style.background = "var(--s1)";
+    document.getElementById("dot").style.animation = "none";
+    document.getElementById("live-title").textContent =
+      "Etapa 3 · fase 1 — cerrada";
+  }
+  document.getElementById("readout").innerHTML = cells.map(([k, v, u]) =>
+    `<div class="cell"><span class="k">${k}</span><span class="v">${v}${u ? ` <small>${u}</small>` : ""}</span></div>`).join("");
+
+  const f1 = DATA.traj.fase1 || [];
+  const note = document.getElementById("live-note");
+  if (res) {
+    note.innerHTML = `Configuración ganadora
+      <span class="num">α=${res.output[0]}, β=${res.output[1]},
+      γ=${res.output[2]}, p=${res.output[3]}</span> — la misma que dio el ensayo
+      sobre 200 instancias. <strong>Las mismas 260 ejecuciones que allá daban
+      10.8× acá dan 80.8×</strong>, porque lo único que cambió es el
+      denominador. La afirmación que se sostiene no es el speedup sino que
+      <strong>las ejecuciones necesarias para llegar al 98% casi no dependen del
+      tamaño del benchmark</strong>.`;
+  } else if (!f1.length) {
+    note.innerHTML = `Todavía no hay ningún punto de likelihood: el motor necesita
+      <span class="num">15</span> ejecuciones por estrategia antes de poder predecir
+      por primera vez, y está en ese calentamiento.`;
+  } else {
+    const last = f1[f1.length - 1];
+    note.innerHTML = `Último punto: <span class="num">${last[0]}</span> ejecuciones,
+      likelihood <span class="num">${(last[1] * 100).toFixed(1)}%</span>,
+      profundidad <span class="num">${last[2]}</span> de 17 — el motor ya cree en la
+      secuencia completa de decisiones y está confirmando la última.
+      Corta al cruzar <span class="num">98%</span>.`;
+  }
+})();
+
+/* ---------- 0b. franja en vivo del run exacto (solo mientras corre) ---------- */
+(function () {
+  const lv = DATA.live;
+  if (!lv || !lv.pid) return;                 // run terminado: manda la vista de resultado
+  const stalled = lv.estado.startsWith("ESTANCADO");
+  const dot = document.getElementById("dot");
+  if (dot) dot.className = "dot" + (stalled ? " warn" : "");
+  const t = document.getElementById("live-title");
+  if (t) t.textContent = "Etapa 3 · fase exacta — 1500 instancias · " + lv.estado.toLowerCase();
+  const sub = document.getElementById("live-sub");
+  if (sub) sub.textContent = "confidence 2.0 (umbral desactivado) · tolerance 0.0116 · −t 30 s";
+
+  const eta = lv.rate ? (lv.goal - lv.on_path) / lv.rate : null;
+  const cells = [
+    ["evaluaciones del camino", `${lv.on_path}`, `/ ${lv.goal}`],
+    ["estrategias del camino", `${lv.path_done}`, `/ ${lv.sweep.length}`],
+    ["errores", lv.errors, ""],
+    ["ritmo", lv.rate ? Math.round(lv.rate) : "—", "evals/h"],
+    ["faltan", eta !== null && !stalled ? eta.toFixed(1) : "—", "h"],
+    ["ramas abandonadas", lv.off_path, "evals"],
+  ];
+  if (lv.foreign) cells.push(["filas ajenas", lv.foreign, "a purgar"]);
+  const ro = document.getElementById("readout");
+  if (ro) ro.innerHTML = cells.map(([k, v, u]) =>
+    `<div class="cell"><span class="k">${k}</span><span class="v">${v}${u ? ` <small>${u}</small>` : ""}</span></div>`).join("");
+
+  const te = DATA.traj_exact || [];
+  const last = te.length ? te[te.length - 1] : null;
+  const note = document.getElementById("live-note");
+  if (note) note.innerHTML =
+    (last ? `Último punto: <span class="num">${last[0]}</span> ejecuciones, likelihood reportada ` +
+            `<span class="num">${(last[1] * 100).toFixed(1)}%</span>, profundidad ` +
+            `<span class="num">${last[2]}</span> de 17. ` : "") +
+    `El umbral está en 2.0: la likelihood se registra pero <strong>no corta nada</strong>; ` +
+    `el run termina cuando las ${lv.sweep.length} estrategias del camino llegan a 1500. ` +
+    `Ganador provisional, por medias completas con tolerance: ` +
+    `<span class="num">${Object.entries(lv.winner).map(([k, v]) => k + "=" + v).join(" ")}</span>.`;
+})();
+
+/* ---------- 1. trayectoria ---------- */
+(function () {
+  const svg = document.getElementById("c-traj");
+  const host = svg.parentElement, T = tipFor(host, document.getElementById("tip-traj"));
+  const W = 980, H = 340, L = 56, R = 138, TP = 18, B = 50;
+  const pw = W - L - R, ph = H - TP - B;
+
+  const series = [
+    { k: "piloto_j8", name: "piloto · 30 inst · 8 jobs", c: C.s1 },
+    { k: "piloto_j1", name: "piloto · 30 inst · 1 job", c: C.s2 },
+    { k: "ensayo", name: "ensayo · 200 inst", c: C.s3 },
+  ].filter(s => (DATA.traj[s.k] || []).length);
+  if ((DATA.traj.fase1 || []).length)
+    series.push({ k: "fase1", name: "fase 1 · 1500 inst", c: "var(--ink)" });
+
+  const allx = series.flatMap(s => DATA.traj[s.k].map(d => d[0]));
+  const xmax = Math.ceil(Math.max(...allx, 60) / 50) * 50 + 20;
+  const X = v => L + (v / xmax) * pw;
+  const Y = v => TP + (1 - v) * ph;
+
+  // grid + y ticks
+  [0, .25, .5, .75, 1].forEach(v => {
+    svg.appendChild(el("line", { x1: L, x2: L + pw, y1: Y(v), y2: Y(v), class: "grid" }));
+    const t = el("text", { x: L - 10, y: Y(v) + 4, class: "tick", "text-anchor": "end" });
+    t.textContent = (v * 100) + "%"; svg.appendChild(t);
+  });
+  // x ticks
+  for (let v = 0; v <= xmax; v += 50) {
+    const t = el("text", { x: X(v), y: TP + ph + 20, class: "tick", "text-anchor": "middle" });
+    t.textContent = v; svg.appendChild(t);
+  }
+  svg.appendChild(el("line", { x1: L, x2: L + pw, y1: TP + ph, y2: TP + ph, class: "axis" }));
+  let ax = el("text", { x: L, y: TP + ph + 40, class: "axname" });
+  ax.textContent = "ejecuciones del solver"; svg.appendChild(ax);
+  ax = el("text", { x: L - 10, y: TP - 4, class: "axname", "text-anchor": "end" });
+  ax.textContent = "L"; svg.appendChild(ax);
+
+  // umbral 0.98
+  svg.appendChild(el("line", { x1: L, x2: L + pw, y1: Y(.98), y2: Y(.98),
+    stroke: "var(--ink-3)", "stroke-width": 1, "stroke-dasharray": "4 4" }));
+  const th = el("text", { x: L + pw, y: Y(.98) - 8, class: "note", "text-anchor": "end" });
+  th.textContent = "confidence = 0.98"; svg.appendChild(th);
+
+  series.forEach(s => {
+    const pts = DATA.traj[s.k];
+    const d = pts.map((p, i) => `${i ? "L" : "M"}${X(p[0])} ${Y(p[1])}`).join(" ");
+    svg.appendChild(el("path", { d, fill: "none", stroke: s.c, "stroke-width": 2,
+      "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    pts.forEach(p => {
+      svg.appendChild(el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 4.5,
+        fill: s.c, stroke: "var(--surface)", "stroke-width": 2 }));
+      const hit = el("circle", { cx: X(p[0]), cy: Y(p[1]), r: 14, fill: "transparent" });
+      hit.addEventListener("mousemove", e => T.show(e,
+        `<b>${s.name}</b><br>${p[0]} ejec · L = ${(p[1] * 100).toFixed(1)}%<br>profundidad ${p[2]}`));
+      hit.addEventListener("mouseleave", () => T.hide());
+      svg.appendChild(hit);
+    });
+    // etiqueta directa al final
+    const last = pts[pts.length - 1];
+    const lab = el("text", { x: X(last[0]) + 12, y: Y(last[1]) + 4, class: "dlabel", fill: s.c });
+    lab.textContent = s.name.split(" · ")[1]; svg.appendChild(lab);
+  });
+
+  document.getElementById("lg-traj").innerHTML = series.map(s =>
+    `<span class="lg"><i style="background:${s.c}"></i>${s.name}</span>`).join("");
+
+  const rows = series.flatMap(s => DATA.traj[s.k].map(p =>
+    `<tr><td>${s.name}</td><td class="n">${p[0]}</td>
+      <td class="n">${(p[1] * 100).toFixed(1)}%</td><td class="n">${p[2]}</td></tr>`));
+  document.querySelector("#t-traj tbody").innerHTML = rows.join("");
+
+  document.getElementById("cap-traj").innerHTML =
+    `El piloto <strong>no sube en línea recta</strong>: L llega a 98.2% con 30 ejecuciones, ` +
+    `cae a 47% con 50 y recién cierra en 100% con 60. Eso es el motor descubriendo que ` +
+    `la comparación estaba más peleada de lo que los primeros datos sugerían — ` +
+    `y es la razón por la que un corte por confianza puede parar demasiado pronto ` +
+    `si el umbral es bajo. El ensayo de 200 instancias, en cambio, entra a la primera ` +
+    `predicción ya con 95.2% y cierra en 50 ejecuciones más: ` +
+    `<strong>260 contra 2800 secuenciales, 10.8× de ahorro.</strong>`;
+})();
+
+/* ---------- 1a. convergencia ---------- */
+(function () {
+  const pts = DATA.traj_exact || [];
+  if (pts.length < 5) { document.getElementById("sec-conv").hidden = true; return; }
+  const svg = document.getElementById("c-conv");
+  const T = tipFor(svg.parentElement, document.getElementById("tip-conv"));
+  const W = 980, H = 400, L = 58, R = 122, TP = 22, B = 74;
+  const pw = W - L - R, ph = H - TP - B;
+  const xmax = Math.ceil(pts[pts.length - 1][0] / 2000) * 2000;
+  const X = v => L + (v / xmax) * pw;
+  const Y = v => TP + (1 - v) * ph;
+
+  [0, .25, .5, .75, 1].forEach(v => {
+    svg.appendChild(el("line", { x1: L, x2: L + pw, y1: Y(v), y2: Y(v), class: "grid" }));
+    const t = el("text", { x: L - 10, y: Y(v) + 4, class: "tick", "text-anchor": "end" });
+    t.textContent = (v * 100) + "%"; svg.appendChild(t);
+  });
+  for (let v = 0; v <= xmax; v += 2000) {
+    const t = el("text", { x: X(v), y: TP + ph + 20, class: "tick", "text-anchor": "middle" });
+    t.textContent = v >= 1000 ? (v / 1000) + "k" : v; svg.appendChild(t);
+  }
+  svg.appendChild(el("line", { x1: L, x2: L + pw, y1: TP + ph, y2: TP + ph, class: "axis" }));
+  let ax = el("text", { x: L, y: TP + ph + 40, class: "axname" });
+  ax.textContent = "ejecuciones del solver"; svg.appendChild(ax);
+
+  // banda del regimen sin informacion (depth = 0)
+  const zero = pts.filter(p => p[2] === 0).map(p => p[0]);
+  if (zero.length) {
+    const z0 = Math.min(...zero), z1 = Math.max(...zero);
+    svg.appendChild(el("rect", { x: X(z0), y: TP, width: X(z1) - X(z0), height: ph,
+      fill: "var(--s2)", opacity: .10 }));
+    const zl = el("text", { x: (X(z0) + X(z1)) / 2, y: TP + 16, class: "note",
+      "text-anchor": "middle", fill: "var(--s2)" });
+    zl.textContent = "profundidad 0 — todas las simulaciones abortan";
+    svg.appendChild(zl);
+  }
+
+  svg.appendChild(el("line", { x1: L, x2: L + pw, y1: Y(.98), y2: Y(.98),
+    stroke: "var(--ink-3)", "stroke-width": 1, "stroke-dasharray": "4 4" }));
+  const th = el("text", { x: L + pw, y: Y(.98) - 7, class: "note", "text-anchor": "end" });
+  th.textContent = "0.98"; svg.appendChild(th);
+
+  // marcas de estrategia completada, sobre el eje
+  (DATA.completions || []).forEach(([n, theta]) => {
+    svg.appendChild(el("line", { x1: X(n), x2: X(n), y1: TP + ph, y2: TP + ph + 9,
+      stroke: C.s3, "stroke-width": 2 }));
+    const hit = el("rect", { x: X(n) - 7, y: TP + ph, width: 14, height: 14,
+      fill: "transparent" });
+    hit.addEventListener("mousemove", e => T.show(e,
+      `<b>estrategia completa</b><br>en la ejecución ${n}<br>${theta}`));
+    hit.addEventListener("mouseleave", () => T.hide());
+    svg.appendChild(hit);
+  });
+  const cl = el("text", { x: L, y: TP + ph + 62, class: "note", fill: C.s3 });
+  cl.textContent = "| marcas: una estrategia llega a las 1500 instancias";
+  svg.appendChild(cl);
+
+  // serie reportada (670 puntos) y serie honesta (muestreada)
+  svg.appendChild(el("path", { fill: "none", stroke: C.s1, "stroke-width": 1.6,
+    "stroke-linejoin": "round",
+    d: pts.map((q, i) => `${i ? "L" : "M"}${X(q[0])} ${Y(q[1])}`).join(" ") }));
+  const hon = (DATA.annot || {}).exact || [];
+  if (hon.length) {
+    svg.appendChild(el("path", { fill: "none", stroke: C.s2, "stroke-width": 2,
+      "stroke-linejoin": "round",
+      d: hon.map((q, i) => `${i ? "L" : "M"}${X(q.runs)} ${Y(q.honest)}`).join(" ") }));
+    hon.forEach(q => svg.appendChild(el("circle", { cx: X(q.runs), cy: Y(q.honest),
+      r: 3.5, fill: C.s2, stroke: "var(--surface)", "stroke-width": 1.5 })));
+  }
+  // replays con imputacion (3 semillas): la trayectoria que NO colapsa
+  const IMP = DATA.traj_impute || {};
+  const impSeeds = Object.keys(IMP).sort();
+  impSeeds.forEach((sd, i) => {
+    const h = IMP[sd].history || [];
+    if (!h.length) return;
+    svg.appendChild(el("path", { fill: "none", stroke: C.s3, "stroke-width": 1.6,
+      opacity: .85, "stroke-linejoin": "round",
+      d: h.map((q, j) => `${j ? "L" : "M"}${X(q[0])} ${Y(q[1])}`).join(" ") }));
+    const last = h[h.length - 1];
+    const stop = el("circle", { cx: X(last[0]), cy: Y(last[1]), r: 5, fill: C.s3,
+      stroke: "var(--surface)", "stroke-width": 2 });
+    stop.addEventListener("mousemove", e => T.show(e,
+      `<b>imputación · semilla ${sd}</b><br>paró en ${last[0]} ejecuciones<br>` +
+      `L = ${(last[1] * 100).toFixed(1)}% · ${IMP[sd].speedup.toFixed(2)}×<br>${IMP[sd].output.join(", ")}`));
+    stop.addEventListener("mouseleave", () => T.hide());
+    svg.appendChild(stop);
+    if (i === impSeeds.length - 1) {
+      const lb = el("text", { x: X(last[0]) + 10, y: Y(last[1]) - 10, class: "dlabel", fill: C.s3 });
+      lb.textContent = "imputación (3 semillas)"; svg.appendChild(lb);
+    }
+  });
+
+  // etiquetas directas al final; si las dos series terminan juntas (lo
+  // esperable una vez que sobreviven las 400 simulaciones), se separan
+  const lastp = pts[pts.length - 1];
+  let yR = Y(lastp[1]) + 4, yH = null;
+  if (hon.length) {
+    const last = hon[hon.length - 1];
+    yH = Y(last.honest) + 4;
+    if (Math.abs(yR - yH) < 15) { yR = Math.min(yR, yH) - 7; yH = yR + 15; }
+    const lb = el("text", { x: X(last.runs) + 10, y: yH, class: "dlabel", fill: C.s2 });
+    lb.textContent = "honesta"; svg.appendChild(lb);
+  }
+  const lb2 = el("text", { x: X(lastp[0]) + 10, y: yR, class: "dlabel", fill: C.s1 });
+  lb2.textContent = "reportada"; svg.appendChild(lb2);
+
+  // crosshair sobre los 670 puntos
+  const cross = el("line", { x1: L, x2: L, y1: TP, y2: TP + ph,
+    stroke: "var(--ink-3)", "stroke-width": 1, opacity: 0 });
+  svg.appendChild(cross);
+  const surface = el("rect", { x: L, y: TP, width: pw, height: ph, fill: "transparent" });
+  surface.addEventListener("mousemove", e => {
+    const bb = svg.getBoundingClientRect();
+    const vx = ((e.clientX - bb.left) / bb.width) * W;
+    const target = ((vx - L) / pw) * xmax;
+    let best = pts[0];
+    for (const q of pts) if (Math.abs(q[0] - target) < Math.abs(best[0] - target)) best = q;
+    cross.setAttribute("x1", X(best[0])); cross.setAttribute("x2", X(best[0]));
+    cross.setAttribute("opacity", .5);
+    T.show(e, `<b>${best[0]} ejecuciones</b><br>L reportada ${(best[1] * 100).toFixed(1)}%<br>` +
+      `profundidad ${best[2]} de 17`);
+  });
+  surface.addEventListener("mouseleave", () => { cross.setAttribute("opacity", 0); T.hide(); });
+  svg.appendChild(surface);
+
+  document.getElementById("lg-conv").innerHTML =
+    `<span class="lg"><i style="background:${C.s1}"></i>L reportada (aciertos / simulaciones vivas)</span>` +
+    (hon.length ? `<span class="lg"><i style="background:${C.s2}"></i>L honesta (aciertos / 400 intentadas)</span>` : "") +
+    (impSeeds.length ? `<span class="lg"><i style="background:${C.s3}"></i>motor con los cuatro arreglos (imputación + k3 + honesto), ${impSeeds.length} semillas</span>` : "");
+
+  const nz = pts.filter(p => p[1] === 0);
+  document.getElementById("cap-conv").innerHTML =
+    `${pts.length} puntos, de ${pts[0][0]} a ${lastp[0]} ejecuciones. ` +
+    (nz.length ? `<strong>${nz.length} de ellos con likelihood exactamente 0</strong>, ` +
+      `entre la ejecución ${nz[0][0]} y la ${nz[nz.length - 1][0]}.` : "") +
+    ` La recuperación acompaña a la acumulación de estrategias con datos casi ` +
+    `completos: con <code>rem = 0</code> el estimador devuelve la suma observada ` +
+    `exacta, sin ruido, así que predicción y simulación dejan de poder discrepar. ` +
+    `Las marcas de completado son una guía, no una causa puntual — la varianza ` +
+    `del posterior ya baja mucho antes de llegar a 1500.` +
+    (() => {
+      const h6 = hon.find(q => q.runs === 6000);
+      if (!h6) return "";
+      return ` <strong>Y el punto que lo resume todo:</strong> en la ejecución 6000 sobrevivió ` +
+        `<span class="num">${h6.alive}</span> simulación de 400, acertó, y el motor reportó ` +
+        `<span class="num">${(h6.reported * 100).toFixed(0)}%</span> de likelihood para el output ` +
+        `<code>${h6.output}</code> — <em>distinto</em> del que converge después ` +
+        `(β=2.0 le gana a β=1.0 por +0.032 pp sobre las 1500 instancias). ` +
+        `Con <code>confidence=0.98</code> el run habría parado ahí, con una configuración ` +
+        `equivocada y confianza máxima.`;
+    })() +
+    (impSeeds.length ? ` <strong>En verde, el motor con los cuatro arreglos:</strong> nunca cae a 0, ` +
+      `baja cuando γ pasa a ser la duda, manda las evaluaciones ahí, y para a ` +
+      `${impSeeds.map(sd => IMP[sd].runs).sort((x, y) => x - y).join(" / ")} ejecuciones ` +
+      `con la referencia — ${impSeeds.map(sd => IMP[sd].speedup.toFixed(2) + "×").join(", ")}.` : "");
+})();
+
+/* ---------- 1d. variabilidad (motor arreglado) ---------- */
+(function () {
+  const V = DATA.variability, sec = document.getElementById("sec-var");
+  const g = V && V.engines && V.engines.arreglado;
+  if (!g || !g.n) { sec.hidden = true; return; }
+  const svg = document.getElementById("c-var");
+  const T = tipFor(svg.parentElement, document.getElementById("tip-var"));
+  const W = 980, H = 400, L = 58, R = 40, TP = 22, B = 74;
+  const pw = W - L - R, ph = H - TP - B;
+  const xmax = Math.ceil(Math.max(...g.stops) / 1000) * 1000 + 500;
+  const X = v => L + (v / xmax) * pw, Y = v => TP + (1 - v) * ph;
+
+  [0, .25, .5, .75, 1].forEach(v => {
+    svg.appendChild(el("line", { x1: L, x2: L + pw, y1: Y(v), y2: Y(v), class: "grid" }));
+    const t = el("text", { x: L - 10, y: Y(v) + 4, class: "tick", "text-anchor": "end" });
+    t.textContent = (v * 100) + "%"; svg.appendChild(t);
+  });
+  for (let v = 0; v <= xmax; v += 1000) {
+    const t = el("text", { x: X(v), y: TP + ph + 20, class: "tick", "text-anchor": "middle" });
+    t.textContent = v >= 1000 ? (v / 1000) + "k" : v; svg.appendChild(t);
+  }
+  svg.appendChild(el("line", { x1: L, x2: L + pw, y1: TP + ph, y2: TP + ph, class: "axis" }));
+  let ax = el("text", { x: L, y: TP + ph + 40, class: "axname" });
+  ax.textContent = "ejecuciones del solver"; svg.appendChild(ax);
+  svg.appendChild(el("line", { x1: L, x2: L + pw, y1: Y(.98), y2: Y(.98),
+    stroke: "var(--ink-3)", "stroke-width": 1, "stroke-dasharray": "4 4" }));
+  const th = el("text", { x: L + pw, y: Y(.98) - 7, class: "note", "text-anchor": "end" });
+  th.textContent = "umbral 0.98"; svg.appendChild(th);
+
+  // banda q10-q90 (solo donde hay >= 2 vivas) y mediana
+  const pts = g.grid.map((x, j) => ({ x, lo: g.q10[j], hi: g.q90[j], md: g.q50[j], n: g.alive[j] }))
+    .filter(p => p.n >= 2 && p.lo !== null);
+  if (pts.length) {
+    svg.appendChild(el("path", { fill: C.s3, opacity: .16, stroke: "none",
+      d: pts.map((p, i) => `${i ? "L" : "M"}${X(p.x)} ${Y(p.hi)}`).join(" ") +
+         pts.slice().reverse().map(p => ` L${X(p.x)} ${Y(p.lo)}`).join("") + " Z" }));
+    svg.appendChild(el("path", { fill: "none", stroke: C.s3, "stroke-width": 2.2, "stroke-linejoin": "round",
+      d: pts.map((p, i) => `${i ? "L" : "M"}${X(p.x)} ${Y(p.md)}`).join(" ") }));
+  }
+  // trayectorias individuales, finas
+  g.runs.forEach(r => svg.appendChild(el("path", { fill: "none", stroke: C.s3, opacity: .22, "stroke-width": 1,
+    d: r.history.map((q, i) => `${i ? "L" : "M"}${X(q[0])} ${Y(q[1])}`).join(" ") })));
+  // paradas
+  g.runs.forEach(r => {
+    const c = el("circle", { cx: X(r.runs), cy: Y(r.L), r: 5,
+      fill: r.correcto ? C.s3 : C.s2, stroke: "var(--surface)", "stroke-width": 2 });
+    c.addEventListener("mousemove", e => T.show(e,
+      `<b>${r.tag}</b><br>paró en ${r.runs} · ${r.speedup.toFixed(2)}×<br>L = ${(r.L * 100).toFixed(1)}%<br>` +
+      `${r.output.join(", ")} ${r.correcto ? "✓" : "✗ (≠ referencia)"}`));
+    c.addEventListener("mouseleave", () => T.hide());
+    svg.appendChild(c);
+  });
+  // franja de paradas sobre el eje
+  g.stops.forEach(s0 => svg.appendChild(el("line", { x1: X(s0), x2: X(s0), y1: TP + ph, y2: TP + ph + 9,
+    stroke: C.s3, "stroke-width": 1.5, opacity: .8 })));
+
+  const med = a => a[Math.floor(a.length / 2)];
+  const cells = [
+    ["semillas", g.n, ""], ["respuestas correctas", `${g.correctas}`, `/ ${g.n}`],
+    ["parada mediana", med(g.stops).toLocaleString("es"), "evals"],
+    ["parada min – max", `${g.stops[0].toLocaleString("es")} – ${g.stops[g.stops.length - 1].toLocaleString("es")}`, ""],
+    ["speedup mediano", med(g.speedups).toFixed(2), "×"],
+    ["speedup min – max", `${g.speedups[0].toFixed(2)} – ${g.speedups[g.speedups.length - 1].toFixed(2)}`, "×"],
+  ];
+  document.getElementById("ro-var").innerHTML = cells.map(([k, v, u]) =>
+    `<div class="cell"><span class="k">${k}</span><span class="v">${v}${u ? ` <small>${u}</small>` : ""}</span></div>`).join("");
+  document.getElementById("lg-var").innerHTML =
+    `<span class="lg"><i style="background:${C.s3}"></i>mediana</span>` +
+    `<span class="lg"><i style="background:${C.s3};opacity:.3;height:8px"></i>rango 10–90% entre corridas vivas</span>` +
+    `<span class="lg"><i style="background:${C.s3};opacity:.35"></i>trayectorias individuales</span>` +
+    `<span class="lg"><i style="background:${C.s2}"></i>parada con respuesta ≠ referencia</span>`;
+  const wrong = g.runs.filter(r => !r.correcto);
+  document.getElementById("cap-var").innerHTML =
+    `Referencia <code>(${V.ref.join(", ")})</code>, medias completas de las 14 estrategias con tolerance. ` +
+    (wrong.length ? `<strong>${wrong.length} de ${g.n} semillas pararon en otra configuración</strong>: ` +
+      wrong.map(r => `${r.tag} → (${r.output.join(", ")})`).join("; ") + "."
+      : `<strong>Las ${g.n} semillas pararon en la referencia.</strong>`) +
+    ` La banda se estrecha y sube conforme se resuelven α, β y γ; el valle antes del final es γ=0.3 vs 0.4 ` +
+    `convirtiéndose en la duda y recibiendo las evaluaciones.`;
+})();
+
+/* ---------- 1c. ablacion ---------- */
+(function () {
+  const rows = DATA.ablation || [];
+  const sec = document.getElementById("sec-ablation");
+  if (!rows.length) { sec.hidden = true; return; }
+  const ord = { sesgado: 0, honesto: 1, imputa: 2 };
+  rows.sort((x, y) => (ord[x.denominador] - ord[y.denominador]) ||
+    x.estimador.localeCompare(y.estimador) || (x.seed - y.seed) || x.tag.localeCompare(y.tag));
+  const label = { sesgado: "sesgado (vivas)", honesto: "honesto (400)", imputa: "imputación" };
+  document.querySelector("#t-ablation tbody").innerHTML = rows.map(r =>
+    `<tr class="${r.correcto ? "" : "tie"}"><td>${label[r.denominador] || r.denominador}</td>
+      <td><code>${r.estimador}</code></td><td class="n">${r.seed}</td>
+      <td class="n">${r.runs.toLocaleString("es")}</td><td class="n">${r.speedup.toFixed(2)}×</td>
+      <td class="n">${(r.L * 100).toFixed(1)}%</td><td class="num">${r.output}</td>
+      <td>${r.correcto ? '<span class="tag ok">sí</span>' : '<span class="tag" style="border-color:var(--s2);color:var(--s2)">no</span>'}</td></tr>`).join("");
+  const by = {};
+  rows.forEach(r => { const k = r.denominador + "·" + r.estimador; (by[k] = by[k] || []).push(r); });
+  const parts = Object.entries(by).map(([k, v]) => {
+    const ok = v.filter(r => r.correcto);
+    const sp = ok.length ? ` (correctas a ${Math.min(...ok.map(r => r.speedup)).toFixed(2)}–${Math.max(...ok.map(r => r.speedup)).toFixed(2)}×)` : "";
+    return `<strong>${k}</strong>: ${ok.length}/${v.length} correctas${sp}`;
+  });
+  document.getElementById("cap-ablation").innerHTML =
+    parts.join(" · ") + `. Referencia correcta: <code>(4.0, 2.0, 0.4, 0.01)</code> — β a 3 SE y γ a 2.3 SE ` +
+    `sobre las 1500 instancias. Las filas naranjas paran con confianza ≥98% en una configuración distinta.`;
+})();
+
+/* ---------- 1b. likelihood honesta ---------- */
+(function () {
+  const A = DATA.annot || {};
+  const runs = [
+    { k: "phase1", name: "fase 1 · 1500 inst" },
+    { k: "rehearsal", name: "ensayo · 200 inst" },
+  ].filter(r => (A[r.k] || []).length);
+  if (!runs.length) { document.getElementById("sec-honest").hidden = true; return; }
+
+  const rows = runs.flatMap(r => A[r.k].map(x => ({ ...x, run: r.name })));
+  const xs = [...new Set(rows.map(r => r.runs))].sort((a, b) => a - b);
+
+  // --- figura 1: reportada vs honesta (solo fase 1, la que decide) ------ #
+  const svg = document.getElementById("c-honest");
+  const T = tipFor(svg.parentElement, document.getElementById("tip-honest"));
+  const W = 980, H = 320, L = 60, R = 132, TP = 20, B = 50;
+  const pw = W - L - R, ph = H - TP - B;
+  const xmin = Math.min(...xs), xmax = Math.max(...xs);
+  const X = v => L + (pw * (v - xmin)) / Math.max(xmax - xmin, 1);
+  const Y = v => TP + (1 - v) * ph;
+
+  [0, .25, .5, .75, 1].forEach(v => {
+    svg.appendChild(el("line", { x1: L, x2: L + pw, y1: Y(v), y2: Y(v), class: "grid" }));
+    const t = el("text", { x: L - 10, y: Y(v) + 4, class: "tick", "text-anchor": "end" });
+    t.textContent = (v * 100) + "%"; svg.appendChild(t);
+  });
+  xs.forEach(v => {
+    const t = el("text", { x: X(v), y: TP + ph + 20, class: "tick", "text-anchor": "middle" });
+    t.textContent = v; svg.appendChild(t);
+  });
+  svg.appendChild(el("line", { x1: L, x2: L + pw, y1: TP + ph, y2: TP + ph, class: "axis" }));
+  let ax = el("text", { x: L, y: TP + ph + 40, class: "axname" });
+  ax.textContent = "ejecuciones del solver"; svg.appendChild(ax);
+
+  svg.appendChild(el("line", { x1: L, x2: L + pw, y1: Y(.98), y2: Y(.98),
+    stroke: "var(--ink-3)", "stroke-width": 1, "stroke-dasharray": "4 4" }));
+  const th = el("text", { x: L + pw, y: Y(.98) - 8, class: "note", "text-anchor": "end" });
+  th.textContent = "umbral de corte = 0.98"; svg.appendChild(th);
+
+  const series = [
+    { f: r => r.reported, name: "reportada", c: C.s2 },
+    { f: r => r.honest, name: "honesta", c: C.s1 },
+  ];
+  const p1 = A.phase1 || [];
+  series.forEach(s => {
+    const pts = p1.map(r => [r.runs, s.f(r)]);
+    svg.appendChild(el("path", { fill: "none", stroke: s.c, "stroke-width": 2,
+      "stroke-linejoin": "round", "stroke-linecap": "round",
+      d: pts.map((q, i) => `${i ? "L" : "M"}${X(q[0])} ${Y(q[1])}`).join(" ") }));
+    pts.forEach((q, i) => {
+      svg.appendChild(el("circle", { cx: X(q[0]), cy: Y(q[1]), r: 4.5, fill: s.c,
+        stroke: "var(--surface)", "stroke-width": 2 }));
+      const hit = el("circle", { cx: X(q[0]), cy: Y(q[1]), r: 15, fill: "transparent" });
+      const r0 = p1[i];
+      hit.addEventListener("mousemove", e => T.show(e,
+        `<b>${s.name}</b> · ${q[0]} ejecuciones<br>` +
+        `${r0.matched} aciertos<br>` +
+        `sobre ${s.name === "honesta" ? r0.nsims + " intentadas" : r0.alive + " vivas"}<br>` +
+        `= ${(q[1] * 100).toFixed(1)}%`));
+      hit.addEventListener("mouseleave", () => T.hide());
+      svg.appendChild(hit);
+    });
+    const last = pts[pts.length - 1];
+    const lab = el("text", { x: X(last[0]) + 12, y: Y(last[1]) + 4, class: "dlabel", fill: s.c });
+    lab.textContent = s.name; svg.appendChild(lab);
+  });
+  document.getElementById("lg-honest").innerHTML = series.map(s =>
+    `<span class="lg"><i style="background:${s.c}"></i>L ${s.name} — fase 1</span>`).join("");
+
+  // --- figura 2: sobrevivientes ----------------------------------------- #
+  const sv = document.getElementById("c-alive");
+  const T2 = tipFor(sv.parentElement, document.getElementById("tip-alive"));
+  const H2 = 200, TP2 = 22, B2 = 50, ph2 = H2 - TP2 - B2;
+  const NS = 400;
+  const Y2 = v => TP2 + (1 - v / NS) * ph2;
+  [0, 100, 200, 300, 400].forEach(v => {
+    sv.appendChild(el("line", { x1: L, x2: L + pw, y1: Y2(v), y2: Y2(v), class: "grid" }));
+    const t = el("text", { x: L - 10, y: Y2(v) + 4, class: "tick", "text-anchor": "end" });
+    t.textContent = v; sv.appendChild(t);
+  });
+  sv.appendChild(el("line", { x1: L, x2: L + pw, y1: TP2 + ph2, y2: TP2 + ph2, class: "axis" }));
+  let ax2 = el("text", { x: L, y: TP2 + ph2 + 40, class: "axname" });
+  ax2.textContent = "ejecuciones del solver"; sv.appendChild(ax2);
+  ax2 = el("text", { x: L - 10, y: TP2 - 6, class: "axname", "text-anchor": "end" });
+  ax2.textContent = "vivas"; sv.appendChild(ax2);
+
+  const bw = Math.min(56, pw / (xs.length * 1.9));
+  p1.forEach(r => {
+    const x = X(r.runs) - bw / 2;
+    const y = Y2(r.alive), h = TP2 + ph2 - y;
+    const rect = el("rect", { x, y, width: bw, height: Math.max(h, 2),
+      fill: C.s1, rx: 4, ry: 4 });
+    rect.addEventListener("mousemove", e => T2.show(e,
+      `<b>${r.runs} ejecuciones</b><br>${r.alive} de ${NS} simulaciones vivas<br>` +
+      `${NS - r.alive} abortaron (${(100 * (NS - r.alive) / NS).toFixed(0)}%)`));
+    rect.addEventListener("mouseleave", () => T2.hide());
+    sv.appendChild(rect);
+    const lab = el("text", { x: X(r.runs), y: y - 8, class: "dlabel", "text-anchor": "middle" });
+    lab.textContent = r.alive; sv.appendChild(lab);
+  });
+
+  document.querySelector("#t-honest tbody").innerHTML = rows.map(r =>
+    `<tr><td>${r.run}</td><td class="n">${r.runs}</td>
+      <td class="n">${r.alive}</td><td class="n">${r.matched}</td>
+      <td class="n">${(r.reported * 100).toFixed(1)}%</td>
+      <td class="n">${(r.honest * 100).toFixed(1)}%</td></tr>`).join("");
+})();
+
+/* ---------- 2. alpha ---------- */
+(function () {
+  const svg = document.getElementById("c-alpha");
+  const host = svg.parentElement, T = tipFor(host, document.getElementById("tip-alpha"));
+  const W = 980, H = 330, L = 68, R = 40, TP = 26, B = 54;
+  const pw = W - L - R, ph = H - TP - B;
+  const d = DATA.stage2, n = d.alphas.length;
+  const lo = 94.82, hi = 95.56;
+  const X = i => L + pw * (i + .5) / n;
+  const Y = v => TP + (1 - (v - lo) / (hi - lo)) * ph;
+
+  for (let v = 94.9; v <= 95.5001; v += .1) {
+    svg.appendChild(el("line", { x1: L, x2: L + pw, y1: Y(v), y2: Y(v), class: "grid" }));
+    const t = el("text", { x: L - 10, y: Y(v) + 4, class: "tick", "text-anchor": "end" });
+    t.textContent = v.toFixed(1); svg.appendChild(t);
+  }
+  svg.appendChild(el("line", { x1: L, x2: L + pw, y1: TP + ph, y2: TP + ph, class: "axis" }));
+  let ax = el("text", { x: L, y: TP + ph + 42, class: "axname" });
+  ax.textContent = "α  (alpha)"; svg.appendChild(ax);
+  ax = el("text", { x: L - 10, y: TP - 10, class: "axname", "text-anchor": "end" });
+  ax.textContent = "pp"; svg.appendChild(ax);
+
+  // banda de la meseta (indices 2 y 3)
+  const bx1 = X(2) - 34, bx2 = X(3) + 34;
+  svg.appendChild(el("rect", { x: bx1, y: TP, width: bx2 - bx1, height: ph,
+    fill: "var(--s2)", opacity: .09, rx: 4 }));
+  const bl = el("text", { x: (bx1 + bx2) / 2, y: TP - 8, class: "note",
+    "text-anchor": "middle", fill: "var(--s2)" });
+  bl.textContent = "meseta · 0.2 SE de separación"; svg.appendChild(bl);
+
+  const se = d.se_paired;
+  d.alphas.forEach((a, i) => {
+    const m = d.means[i];
+    const t = el("text", { x: X(i), y: TP + ph + 20, class: "tick", "text-anchor": "middle" });
+    t.textContent = a.toFixed(1); svg.appendChild(t);
+    // barra de error ±1 SE
+    svg.appendChild(el("line", { x1: X(i), x2: X(i), y1: Y(m - se), y2: Y(m + se),
+      stroke: "var(--s1)", "stroke-width": 2, "stroke-linecap": "round" }));
+    [m - se, m + se].forEach(v => svg.appendChild(el("line",
+      { x1: X(i) - 6, x2: X(i) + 6, y1: Y(v), y2: Y(v), stroke: "var(--s1)", "stroke-width": 2 })));
+    svg.appendChild(el("circle", { cx: X(i), cy: Y(m), r: 6,
+      fill: "var(--s1)", stroke: "var(--surface)", "stroke-width": 2 }));
+    const lab = el("text", { x: X(i), y: Y(m) - 20, class: "dlabel", "text-anchor": "middle" });
+    lab.textContent = m.toFixed(3); svg.appendChild(lab);
+    const hit = el("rect", { x: X(i) - 30, y: TP, width: 60, height: ph, fill: "transparent" });
+    hit.addEventListener("mousemove", e => T.show(e,
+      `<b>α = ${a}</b><br>media ${m.toFixed(4)} pp<br>sd marginal ${d.sds[i].toFixed(4)} pp<br>±1 SE pareado = ${se.toFixed(4)}`));
+    hit.addEventListener("mouseleave", () => T.hide());
+    svg.appendChild(hit);
+  });
+
+  // linea que une las medias
+  svg.appendChild(el("path", { fill: "none", stroke: "var(--s1)", "stroke-width": 2,
+    opacity: .35, "stroke-linejoin": "round",
+    d: d.means.map((m, i) => `${i ? "L" : "M"}${X(i)} ${Y(m)}`).join(" ") }));
+
+  const tb = document.querySelector("#t-alpha tbody");
+  tb.innerHTML = d.alphas.map((a, i) => {
+    const m = d.means[i];
+    const prev = i ? d.means[i - 1] : null;
+    const dd = prev === null ? null : m - prev;
+    const nse = dd === null ? null : dd / d.se_consecutive[i - 1];
+    const tie = nse !== null && Math.abs(nse) < 1;
+    const read = i === 0 ? "punto de partida"
+      : tie ? "empate — por debajo de tolerance"
+      : dd > 0 ? "mejora" : "empeora";
+    return `<tr class="${tie ? "tie" : ""}"><td class="n">${a.toFixed(1)}</td>
+      <td class="n">${m.toFixed(4)}</td><td class="n">${d.sds[i].toFixed(4)}</td>
+      <td class="n">${dd === null ? "—" : (dd > 0 ? "+" : "") + dd.toFixed(4)}</td>
+      <td class="n">${nse === null ? "—" : (nse > 0 ? "+" : "") + nse.toFixed(1)}</td>
+      <td>${read}</td></tr>`;
+  }).join("");
+})();
+
+/* ---------- 3. varianza ---------- */
+(function () {
+  const svg = document.getElementById("c-var");
+  const host = svg.parentElement, T = tipFor(host, document.getElementById("tip-var"));
+  const W = 980, H = 180, L = 56, R = 56, TP = 46;
+  const pw = W - L - R, bh = 46;
+  const v = DATA.stage2.var;
+  const tot = v.inst + v.resid + v.strat;
+  const segs = [
+    { k: "efecto de instancia", v: v.inst, c: C.s1, note: "lo que el pareado cancela" },
+    { k: "residuo", v: v.resid, c: C.s3, note: "lo que queda después de parear" },
+    { k: "efecto de configuración", v: v.strat, c: C.s2, note: "la señal que se busca" },
+  ];
+  let x = L;
+  segs.forEach((s, i) => {
+    const w = (s.v / tot) * pw - (i < segs.length - 1 ? 2 : 0);
+    const r = el("rect", { x, y: TP, width: Math.max(w, 2), height: bh, fill: s.c,
+      rx: 4, ry: 4 });
+    r.addEventListener("mousemove", e => T.show(e,
+      `<b>${s.k}</b><br>${(s.v / tot * 100).toFixed(1)}% de la varianza<br>v = ${s.v.toFixed(5)}<br>${s.note}`));
+    r.addEventListener("mouseleave", () => T.hide());
+    svg.appendChild(r);
+    const pct = s.v / tot * 100;
+    if (pct > 8) {
+      const lab = el("text", { x: x + 12, y: TP + 29, class: "dlabel", fill: "#fff" });
+      lab.textContent = pct.toFixed(1) + "%"; svg.appendChild(lab);
+    }
+    const cap = el("text", { x: x + (pct > 8 ? 0 : -4), y: TP - 12, class: "note",
+      fill: s.c, "text-anchor": pct > 8 ? "start" : "end" });
+    cap.textContent = s.k; svg.appendChild(cap);
+    x += (s.v / tot) * pw;
+  });
+  const foot = el("text", { x: L, y: TP + bh + 30, class: "note" });
+  foot.textContent = "varianza total de una evaluación = " + tot.toFixed(4) + " pp²";
+  svg.appendChild(foot);
+
+  const p = DATA.stage2;
+  const cells = [
+    ["frac. de instancia", p.var.frac_inst.toFixed(3), ""],
+    ["ρ mínimo entre pares", p.rho_min.toFixed(3), ""],
+    ["SE pareado", p.se_paired.toFixed(4), "pp"],
+    ["SE independiente", p.se_indep.toFixed(4), "pp"],
+    ["ventaja del pareado", (p.se_indep / p.se_paired).toFixed(2), "×"],
+    ["instancias equivalentes", Math.pow(p.se_indep / p.se_paired, 2).toFixed(1), "×"],
+  ];
+  document.getElementById("ro-prec").innerHTML = cells.map(([k, val, u]) =>
+    `<div class="cell"><span class="k">${k}</span><span class="v">${val}${u ? ` <small>${u}</small>` : ""}</span></div>`).join("");
+})();
+
+/* ---------- 4. costo por familia ---------- */
+(function () {
+  const svg = document.getElementById("c-cost");
+  const host = svg.parentElement, T = tipFor(host, document.getElementById("tip-cost"));
+  const W = 980, H = 300, L = 60, R = 130, TP = 20, B = 54;
+  const pw = W - L - R, ph = H - TP - B;
+  const d = DATA.cost, n = d.length;
+  const lo = 29.9, hi = 33.6;
+  const X = v => L + ((v - lo) / (hi - lo)) * pw;
+  const Yr = i => TP + ph * (i + .5) / n;
+
+  for (let v = 30; v <= 33.5; v += .5) {
+    svg.appendChild(el("line", { x1: X(v), x2: X(v), y1: TP, y2: TP + ph, class: "grid" }));
+    const t = el("text", { x: X(v), y: TP + ph + 20, class: "tick", "text-anchor": "middle" });
+    t.textContent = v.toFixed(1); svg.appendChild(t);
+  }
+  // limite nominal
+  svg.appendChild(el("line", { x1: X(30), x2: X(30), y1: TP, y2: TP + ph,
+    stroke: "var(--ink-3)", "stroke-width": 1.5, "stroke-dasharray": "4 4" }));
+  const nl = el("text", { x: X(30), y: TP - 6, class: "note", "text-anchor": "middle" });
+  nl.textContent = "−t 30"; svg.appendChild(nl);
+  const ax = el("text", { x: L, y: TP + ph + 42, class: "axname" });
+  ax.textContent = "segundos de reloj por ejecución"; svg.appendChild(ax);
+
+  d.forEach((f, i) => {
+    const y = Yr(i);
+    const t = el("text", { x: L - 12, y: y + 4, class: "tick", "text-anchor": "end" });
+    t.textContent = f.fam; svg.appendChild(t);
+    // rango mediana -> max
+    svg.appendChild(el("line", { x1: X(f.median), x2: X(f.max), y1: y, y2: y,
+      stroke: "var(--s1)", "stroke-width": 2, opacity: .3, "stroke-linecap": "round" }));
+    svg.appendChild(el("circle", { cx: X(f.max), cy: y, r: 4,
+      fill: "none", stroke: "var(--s1)", "stroke-width": 2 }));
+    svg.appendChild(el("circle", { cx: X(f.median), cy: y, r: 5,
+      fill: "var(--s1)", stroke: "var(--surface)", "stroke-width": 2 }));
+    const hit = el("rect", { x: L, y: y - 8, width: pw, height: 16, fill: "transparent" });
+    hit.addEventListener("mousemove", e => T.show(e,
+      `<b>${f.fam}</b> · ${f.n} ejecuciones<br>mediana ${f.median.toFixed(2)} s<br>máximo ${f.max.toFixed(2)} s`));
+    hit.addEventListener("mouseleave", () => T.hide());
+    svg.appendChild(hit);
+  });
+  // leyenda inline a la derecha
+  const g = el("g", {});
+  const y0 = TP + 14;
+  g.appendChild(el("circle", { cx: L + pw + 26, cy: y0, r: 5, fill: "var(--s1)" }));
+  let lt = el("text", { x: L + pw + 38, y: y0 + 4, class: "note" });
+  lt.textContent = "mediana"; g.appendChild(lt);
+  g.appendChild(el("circle", { cx: L + pw + 26, cy: y0 + 22, r: 4, fill: "none",
+    stroke: "var(--s1)", "stroke-width": 2 }));
+  lt = el("text", { x: L + pw + 38, y: y0 + 26, class: "note" });
+  lt.textContent = "máximo"; g.appendChild(lt);
+  svg.appendChild(g);
+})();
+
+/* ---------- footer ---------- */
+document.getElementById("foot").innerHTML =
+  `Generado por <code>runs/viz_build.py</code> desde los artefactos del run · ` +
+  `binario <code>bsg_algo/BSG_CLP</code> md5 4c9b91d1 · ` +
+  `las evaluaciones crudas viven en <code>runs/*_evals.csv</code><br>` +
+  `Instantánea estática: los números de la fase 1 son los del momento de generarla, ` +
+  `no se actualizan solos.`;
+</script>

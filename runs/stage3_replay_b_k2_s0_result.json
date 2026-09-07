@@ -1,0 +1,42 @@
+{
+ "output": [
+  4.0,
+  2.0,
+  0.3,
+  0.01
+ ],
+ "likelihood": 0.9838709677419355,
+ "runs": 285,
+ "sequential_runs": 21000,
+ "speedup": 73.6842105263158,
+ "hits": 285,
+ "misses": 0,
+ "confidence": 0.98,
+ "tolerance": 0.0116,
+ "nsims": 400,
+ "oracle": "/home/iaraya/sepeculative_experiments/T4exps_clean/runs/stage3_exact_evals.csv",
+ "honest": false,
+ "estimator": "paired_k2",
+ "history": [
+  [
+   210,
+   0.8914285714285715,
+   17
+  ],
+  [
+   235,
+   0.9096774193548387,
+   17
+  ],
+  [
+   260,
+   0.9772727272727273,
+   17
+  ],
+  [
+   285,
+   0.9838709677419355,
+   17
+  ]
+ ]
+}

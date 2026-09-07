@@ -1,0 +1,224 @@
+{
+ "phase1": [
+  {
+   "runs": 210,
+   "alive": 171,
+   "matched": 153,
+   "nsims": 400,
+   "reported": 0.8947368421052632,
+   "honest": 0.3825,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 235,
+   "alive": 64,
+   "matched": 56,
+   "nsims": 400,
+   "reported": 0.875,
+   "honest": 0.14,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 260,
+   "alive": 80,
+   "matched": 77,
+   "nsims": 400,
+   "reported": 0.9625,
+   "honest": 0.1925,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  }
+ ],
+ "rehearsal": [
+  {
+   "runs": 210,
+   "alive": 154,
+   "matched": 142,
+   "nsims": 400,
+   "reported": 0.922077922077922,
+   "honest": 0.355,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 235,
+   "alive": 56,
+   "matched": 52,
+   "nsims": 400,
+   "reported": 0.9285714285714286,
+   "honest": 0.13,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 260,
+   "alive": 61,
+   "matched": 59,
+   "nsims": 400,
+   "reported": 0.9672131147540983,
+   "honest": 0.1475,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  }
+ ],
+ "exact": [
+  {
+   "runs": 210,
+   "alive": 175,
+   "matched": 156,
+   "nsims": 400,
+   "reported": 0.8914285714285715,
+   "honest": 0.39,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 260,
+   "alive": 75,
+   "matched": 72,
+   "nsims": 400,
+   "reported": 0.96,
+   "honest": 0.18,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 400,
+   "alive": 0,
+   "matched": 0,
+   "nsims": 400,
+   "reported": 0.0,
+   "honest": 0.0,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 2000,
+   "alive": 0,
+   "matched": 0,
+   "nsims": 400,
+   "reported": 0.0,
+   "honest": 0.0,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 3420,
+   "alive": 1,
+   "matched": 0,
+   "nsims": 400,
+   "reported": 0.0,
+   "honest": 0.0,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 3520,
+   "alive": 2,
+   "matched": 0,
+   "nsims": 400,
+   "reported": 0.0,
+   "honest": 0.0,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 3570,
+   "alive": 0,
+   "matched": 0,
+   "nsims": 400,
+   "reported": 0.0,
+   "honest": 0.0,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 4000,
+   "alive": 0,
+   "matched": 0,
+   "nsims": 400,
+   "reported": 0.0,
+   "honest": 0.0,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 5000,
+   "alive": 11,
+   "matched": 10,
+   "nsims": 400,
+   "reported": 0.9090909090909091,
+   "honest": 0.025,
+   "output": "(4.0, 2.0, 0.3, 0.01)"
+  },
+  {
+   "runs": 6000,
+   "alive": 1,
+   "matched": 1,
+   "nsims": 400,
+   "reported": 1.0,
+   "honest": 0.0025,
+   "output": "(4.0, 1.0, 0.4, 0.01)"
+  },
+  {
+   "runs": 7000,
+   "alive": 400,
+   "matched": 399,
+   "nsims": 400,
+   "reported": 0.9975,
+   "honest": 0.9975,
+   "output": "(4.0, 2.0, 0.4, 0.01)"
+  },
+  {
+   "runs": 8000,
+   "alive": 397,
+   "matched": 389,
+   "nsims": 400,
+   "reported": 0.9798488664987406,
+   "honest": 0.9725,
+   "output": "(4.0, 2.0, 0.4, 0.01)"
+  },
+  {
+   "runs": 9000,
+   "alive": 392,
+   "matched": 368,
+   "nsims": 400,
+   "reported": 0.9387755102040817,
+   "honest": 0.92,
+   "output": "(4.0, 2.0, 0.4, 0.01)"
+  },
+  {
+   "runs": 10000,
+   "alive": 357,
+   "matched": 356,
+   "nsims": 400,
+   "reported": 0.9971988795518207,
+   "honest": 0.89,
+   "output": "(4.0, 2.0, 0.4, 0.01)"
+  },
+  {
+   "runs": 12000,
+   "alive": 368,
+   "matched": 355,
+   "nsims": 400,
+   "reported": 0.9646739130434783,
+   "honest": 0.8875,
+   "output": "(4.0, 2.0, 0.4, 0.01)"
+  },
+  {
+   "runs": 14000,
+   "alive": 399,
+   "matched": 389,
+   "nsims": 400,
+   "reported": 0.974937343358396,
+   "honest": 0.9725,
+   "output": "(4.0, 2.0, 0.4, 0.01)"
+  },
+  {
+   "runs": 16000,
+   "alive": 400,
+   "matched": 387,
+   "nsims": 400,
+   "reported": 0.9675,
+   "honest": 0.9675,
+   "output": "(4.0, 2.0, 0.4, 0.01)"
+  },
+  {
+   "runs": 17000,
+   "alive": 399,
+   "matched": 390,
+   "nsims": 400,
+   "reported": 0.9774436090225563,
+   "honest": 0.975,
+   "output": "(4.0, 2.0, 0.4, 0.01)"
+  }
+ ]
+}

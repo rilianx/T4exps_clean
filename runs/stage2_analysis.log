@@ -1,0 +1,69 @@
+==============================================================================
+ETAPA 2 -- analisis   Y (5, 200)   alphas [np.float64(0.0), np.float64(1.0), np.float64(2.0), np.float64(4.0), np.float64(8.0)]
+==============================================================================
+
+medias por configuracion (puntos porcentuales de utilizacion):
+  alpha=0.0   media= 94.9064  sd=1.0381
+  alpha=1.0   media= 95.2749  sd=0.8848
+  alpha=2.0   media= 95.4466  sd=0.8604
+  alpha=4.0   media= 95.4516  sd=0.8440
+  alpha=8.0   media= 95.3037  sd=0.9154
+  sd marginal promedio = 0.9085 pp (NOTES.md dice ~0.95)
+
+[A1] Descomposicion de varianzas
+  v_inst  (efecto instancia, corregido) = 0.72455
+  v_strat (efecto configuracion, corr.) = 0.04881
+  v_resid (residuo)                     = 0.10567
+  frac_inst = 0.8243   (naive sin correccion: 0.8279)
+  => PAREADO ES LA HISTORIA (>0.7)
+
+[A2] Aditividad -- Spearman entre configuraciones
+          0.0     1.0     2.0     4.0     8.0
+  0.0    1.000   0.859   0.838   0.851   0.840
+  1.0    0.859   1.000   0.884   0.851   0.857
+  2.0    0.838   0.884   1.000   0.865   0.842
+  4.0    0.851   0.851   0.865   1.000   0.882
+  8.0    0.840   0.857   0.842   0.882   1.000
+  rho_min (sobre pares) = 0.838  => pareado sin miedo (>0.8)
+
+[A3] Calibracion de tolerance
+  SE de la diferencia de medias, PAREADO   = 0.03165 pp   <- tolerance
+  SE de la diferencia de medias, INDEP.    = 0.08848 pp
+  brecha = 2.80x  ->  el independiente necesita 7.8x mas instancias para la misma precision
+  (sd marginal = 0.8848 pp; sd de la diferencia pareada = 0.4476 pp)
+  => tolerance = 0.0316
+
+  separacion entre configuraciones consecutivas (en SE pareados):
+    alpha  0.0 -> 1.0    +0.3685 pp =   +10.8 SE
+    alpha  1.0 -> 2.0    +0.1717 pp =    +6.2 SE
+    alpha  2.0 -> 4.0    +0.0050 pp =    +0.2 SE   <- por DEBAJO de tolerance: empate
+    alpha  4.0 -> 8.0    -0.1479 pp =    -5.4 SE
+
+[A4] cost_aware
+  segundos por ejecucion: min 30.03  mediana 30.50  max 33.27
+    BR1    mediana  30.07s  max  30.33s
+    BR2    mediana  30.13s  max  30.32s
+    BR3    mediana  30.12s  max  30.30s
+    BR4    mediana  30.16s  max  30.30s
+    BR5    mediana  30.17s  max  30.39s
+    BR6    mediana  30.15s  max  30.26s
+    BR7    mediana  30.12s  max  30.23s
+    BR8    mediana  30.53s  max  32.43s
+    BR9    mediana  30.72s  max  31.57s
+    BR10   mediana  30.65s  max  31.29s
+    BR11   mediana  30.91s  max  32.71s
+    BR12   mediana  30.76s  max  32.12s
+    BR13   mediana  31.07s  max  31.87s
+    BR14   mediana  31.62s  max  33.27s
+    BR15   mediana  31.52s  max  33.02s
+  dispersion entre familias = 1.05x  (>3x justificaria cost_aware=True)
+  => cost_aware = False
+
+  PEOR wall observado = 33.27s (exceso +11% sobre -t 30)
+
+==============================================================================
+RESUMEN PARA LA ETAPA 3:
+  estimator  = paired  (PAREADO ES LA HISTORIA (>0.7))
+  tolerance  = 0.0316
+  cost_aware = decidido arriba
+==============================================================================

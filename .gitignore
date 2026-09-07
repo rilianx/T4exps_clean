@@ -1,0 +1,28 @@
+# entorno y artefactos de python
+.venv/
+__pycache__/
+*.pyc
+.coverage
+*.egg-info/
+.pytest_cache/
+
+# binario del solver: vive en /home/iaraya/T4exps/bsg_algo/ (ver PLAN.md)
+BSG_CLP
+
+# runs/: se versionan los datos canonicos y los resultados; no lo regenerable
+runs/*.log
+!runs/stage1.log
+!runs/stage2*.log
+!runs/stage3_exact*.log
+!runs/stage3_phase1.log
+!runs/stage3_rehearsal.log
+!runs/load_probe_*.log
+runs/*.bak
+runs/*.pkl
+runs/.probe*
+runs/*FOREIGN.csv
+# evaluaciones de cada replay: se re-juegan contra el oraculo en minutos.
+# Se conservan las que pagaron solver real (son la procedencia de oracle_extended.csv).
+runs/stage3_replay_*_evals.csv
+runs/stage3_var_*_evals.csv
+!runs/stage3_replay_*_solver_*_evals.csv

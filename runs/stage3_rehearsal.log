@@ -1,0 +1,16 @@
+==============================================================================
+ETAPA 3 [rehearsal]  200 instancias  T=30s  timeout=75.0s  jobs=8
+  confidence=0.98  tolerance=0.0316  cost_aware=False
+==============================================================================
+[   210 runs] L=95.2% depth=17 -> <bsg a=4.0, b=2.0, g=0.1, p=0.01> (I=1.00)
+[   235 runs] L=96.9% depth=17 -> <bsg a=4.0, b=0.5, g=0.1, p=0.01> (I=1.00)
+[   260 runs] L=100.0% depth=17 -> <bsg a=2.0, b=0.5, g=0.1, p=0.01> (I=1.00)
+
+(4.0, 2.0, 0.3, 0.01)  (likelihood 100%, 260 runs vs 2800 sequential, -2540 wasted)
+  runs            = 260
+  sequential_runs = 2800
+  speedup         = 10.77x
+  likelihood      = 1.0000
+  wasted_runs     = -2540
+  wall            = 0.31 h
+  log -> /home/iaraya/sepeculative_experiments/T4exps_clean/runs/stage3_rehearsal_history.csv

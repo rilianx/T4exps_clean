@@ -1,0 +1,93 @@
+==============================================================================
+ETAPA 1 -- piloto de plomeria   T=5s  timeout=25s  30 instancias  cwd=/home/iaraya/sepeculative_experiments/T4exps_clean
+==============================================================================
+
+[1] Comando formateado
+  /home/iaraya/T4exps/bsg_algo/BSG_CLP /home/iaraya/T4exps/bsg_algo/BR8.txt -i 93 --min_fr=0.98 -t 30 --alpha=4.0 --beta=1.0 --gamma=0.2 -p 0.04 -t 5
+  [OK ] {INSTANCE} se sustituye
+  [OK ] no se dispara el fallback que appendea la instancia
+  [OK ] flags largos --alpha/--beta/--gamma y -p
+  [OK ] no aparecen los flags inexistentes -a/-b/-g
+  [OK ] -t del template queda DESPUES del -t del archivo
+
+[2] Una ejecucion cruda (stdout completo)
+  [BSG_path] new best_solution_found (3.031741): 0.94691502 34 nodes
+  [BSG_path] new best_solution_found (3.384185): 0.94953339 36 nodes
+  [DoubleEffort] new best_solution_found (3.425803): 0.94953339
+  beams/max_level_size:6/36
+  % volume utilization
+  94.953339
+  [OK ] exit code 0  exit=0 stderr=''
+  [OK ] el ultimo float es la utilizacion
+  [OK ] escala porcentaje (0-100), no fraccion  valor=94.953339
+  [OK ] el -t del template gana (wall 5.49s, no ~30s)  wall=5.49s
+
+[3] Deteccion de familias sobre lineas con argumentos
+  15 familias, cuentas: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+  [OK ] 15 familias en el prefijo de 30
+  [OK ] 2 instancias por familia
+  [OK ] 1500 instancias, 15 familias x 100
+
+[4] Modo de falla del timeout (a proposito, timeout=1)
+  [OK ] timeout=1 lanza TimeoutExpired  TimeoutExpired: mata el proceso, sin valor
+
+[5] sequential_execution n_jobs=1  (60 ejecuciones)
+  output='a=4.0, b=1.0, g=0.2, p=0.04'  runs=60  wall=338s
+  [OK ] cero RunError en secuencial
+  [OK ] sequential hace strategies x instances  runs=60
+
+[6.8] Engine n_jobs=8
+[    20 runs] L=84.8% depth=1 -> <bsg a=8.0, b=1.0, g=0.2, p=0.04> (I=0.62)
+[    30 runs] L=98.2% depth=1 -> <bsg a=4.0, b=1.0, g=0.2, p=0.04> (I=0.56)
+[    40 runs] L=88.8% depth=1 -> <bsg a=4.0, b=1.0, g=0.2, p=0.04> (I=0.70)
+[    50 runs] L=47.0% depth=1 -> <bsg a=8.0, b=1.0, g=0.2, p=0.04> (I=1.00)
+[    60 runs] L=100.0% depth=1 -> None (I=0.00)
+  -> 'a=4.0, b=1.0, g=0.2, p=0.04'  (likelihood 100%, 60 runs vs 60 sequential, 0 wasted)   wall=67s
+
+[6.1] Engine n_jobs=1
+[    20 runs] L=85.5% depth=1 -> <bsg a=8.0, b=1.0, g=0.2, p=0.04> (I=0.60)
+[    30 runs] L=98.2% depth=1 -> <bsg a=4.0, b=1.0, g=0.2, p=0.04> (I=0.50)
+[    40 runs] L=89.8% depth=1 -> <bsg a=4.0, b=1.0, g=0.2, p=0.04> (I=0.68)
+[    50 runs] L=50.5% depth=1 -> <bsg a=8.0, b=1.0, g=0.2, p=0.04> (I=1.00)
+[    60 runs] L=100.0% depth=1 -> None (I=0.00)
+  -> 'a=4.0, b=1.0, g=0.2, p=0.04'  (likelihood 100%, 60 runs vs 60 sequential, 0 wasted)   wall=338s
+
+[7] Invariantes
+  [OK ] secuencial == incremental (output)  'a=4.0, b=1.0, g=0.2, p=0.04' vs 'a=4.0, b=1.0, g=0.2, p=0.04'
+  [OK ] likelihood == 1.0 con confidence=1.0  L=1.0
+  [OK ] n_jobs=1 y n_jobs=8 dan el mismo output  'a=4.0, b=1.0, g=0.2, p=0.04' vs 'a=4.0, b=1.0, g=0.2, p=0.04'
+  [OK ] mismas estrategias evaluadas
+  [FALLA] n_jobs=1 y n_jobs=8 dan las MISMAS evaluaciones  2/60 difieren, max |dif| = 0.1507 pp
+  [OK ] [j8] ninguna instancia evaluada dos veces
+  [OK ] [j8] total_runs == suma de evaluaciones  60 vs 60
+  [OK ] [j8] cero errores de ejecucion  []
+  [OK ] [j1] ninguna instancia evaluada dos veces
+  [OK ] [j1] total_runs == suma de evaluaciones  60 vs 60
+  [OK ] [j1] cero errores de ejecucion  []
+
+[8] Exceso de tiempo por familia (de los CSV)
+  BR1    n=8   medio  5.08s  max  5.08s  exceso max    +2%
+  BR2    n=8   medio  5.12s  max  5.19s  exceso max    +4%
+  BR3    n=8   medio  5.18s  max  5.22s  exceso max    +4%
+  BR4    n=8   medio  5.13s  max  5.19s  exceso max    +4%
+  BR5    n=8   medio  5.24s  max  5.37s  exceso max    +7%
+  BR6    n=8   medio  5.18s  max  5.25s  exceso max    +5%
+  BR7    n=8   medio  5.10s  max  5.13s  exceso max    +3%
+  BR8    n=8   medio  5.57s  max  5.66s  exceso max   +13%
+  BR9    n=8   medio  5.81s  max  5.85s  exceso max   +17%
+  BR10   n=8   medio  6.03s  max  6.28s  exceso max   +26%
+  BR11   n=8   medio  5.82s  max  5.92s  exceso max   +18%
+  BR12   n=8   medio  5.75s  max  5.76s  exceso max   +15%
+  BR13   n=8   medio  6.00s  max  6.15s  exceso max   +23%
+  BR14   n=8   medio  6.26s  max  6.61s  exceso max   +32%
+  BR15   n=8   medio  7.15s  max  7.75s  exceso max   +55%
+
+  PEOR exceso observado: 7.75s con -t 5  (+55%)
+  => timeout sugerido para T=30: max(2*30+15, 30*1.55+margen)
+  [OK ] ningun run murio por timeout (25s)  peor 7.75s
+
+==============================================================================
+ETAPA 1: 26 OK, 1 FALLAS
+  FALLA: n_jobs=1 y n_jobs=8 dan las MISMAS evaluaciones
+tiempos: seq(j1)=338s  engine(j8)=67s  engine(j1)=338s
+==============================================================================
