@@ -78,6 +78,9 @@ class Engine:
         parse=None,
         honest_likelihood: bool = True,
         impute_missing: bool = True,
+        impute_prior_scale: float = 1.0,
+        nsims_confirm: int | None = None,
+        impact_on: str = "prefix",
     ):
         self.experiment = experiment
         instances = order_instances(instances, instance_order, family, seed)
@@ -104,6 +107,20 @@ class Engine:
         # estimator='paired_legacy' reproduces the original engine.
         self.honest_likelihood = honest_likelihood
         self.impute_missing = impute_missing
+        # impute_prior_scale multiplica la sd del prior de imputacion (sd de los
+        # totales conocidos en esa simulacion): >1 explora mas, <1 menos.
+        self.impute_prior_scale = impute_prior_scale
+        # nsims_confirm: cuando la likelihood queda a menos de 0.05 del umbral,
+        # se re-estima con este numero de simulaciones antes de decidir parar.
+        # Con 400 el error MC es +-0.7 pp, del orden de la distancia al 0.98.
+        self.nsims_confirm = nsims_confirm
+        # impact_on: 'prefix' mide el impacto de una estrategia sobre la
+        # likelihood del prefijo de decisiones creido (original); 'output' lo
+        # mide sobre la likelihood del OUTPUT, que es lo que la regla de parada
+        # certifica -- asi no se gasta en decisiones que no cambian la respuesta.
+        if impact_on not in ("prefix", "output"):
+            raise ValueError("impact_on must be 'prefix' or 'output'")
+        self.impact_on = impact_on
         self.verbose = verbose
         self.history: List[Snapshot] = []
         self._path_runs = 0
@@ -178,7 +195,7 @@ class Engine:
                 mu = float(col.mean())
                 sd = float(col.std()) if col.size > 1 else 0.0
                 sums = _ImputingSums(sums, np.random.default_rng(self.seed * 100003 + sim),
-                                     mu, max(sd, 1e-9))
+                                     mu, max(sd * self.impute_prior_scale, 1e-9))
             out, ctx = self._simulate_once(sums)
             if out is None:
                 if self.honest_likelihood:
@@ -215,6 +232,17 @@ class Engine:
                 if outputs
                 else 0.0
             )
+            if (self.nsims_confirm and self.nsims_confirm > self.nsims
+                    and likelihood >= self.confidence - 0.05):
+                # cerca del umbral: la decision de parar no debe depender del
+                # ruido MC de nsims. Se re-estima con mas simulaciones (mismo
+                # cache, otros sorteos) y esa es la likelihood que vale.
+                draws_c = self.estimator.draws(
+                    {k: self.runner.evals.get(k, []) for k in keys if self.runner.evals.get(k)},
+                    self.n_instances, self.nsims_confirm, self.rng)
+                _, outputs_c = self._run_simulations(draws_c, budget=self.nsims_confirm)
+                likelihood = (sum(1 for o in outputs_c if o == target_output) / len(outputs_c)
+                              if outputs_c else 0.0)
 
             # deepest checkpoint we still believe in (sec. 4.2.4 of the paper,
             # but expressed as a prefix of the decision sequence)
@@ -240,13 +268,19 @@ class Engine:
                     continue
                 lo = draws.quantile(s.key, self.percentile)
                 hi = draws.quantile(s.key, 1 - self.percentile)
-                l_minus, _ = self._run_simulations(
+                l_minus, o_minus = self._run_simulations(
                     draws, override=(s.key, lo), budget=self.nsims_impact)
-                l_plus, _ = self._run_simulations(
+                l_plus, o_plus = self._run_simulations(
                     draws, override=(s.key, hi), budget=self.nsims_impact)
-                lm = self._prefix_likelihood(l_minus, probable_state)
-                lp = self._prefix_likelihood(l_plus, probable_state)
-                impact = max(0.0, min(1.0, 1.0 - min(lm, lp) / base))
+                if self.impact_on == "output":
+                    frac = lambda outs: (sum(1 for o in outs if o == target_output) / len(outs)) if outs else 0.0
+                    lm, lp = frac(o_minus), frac(o_plus)
+                    base_i = likelihood or 1e-9
+                else:
+                    lm = self._prefix_likelihood(l_minus, probable_state)
+                    lp = self._prefix_likelihood(l_plus, probable_state)
+                    base_i = base
+                impact = max(0.0, min(1.0, 1.0 - min(lm, lp) / base_i))
                 swing = abs(lp - lm)
                 cost = self.runner.mean_seconds(s) if self.cost_aware else 0.0
                 scale = 1.0 / cost if cost > 0 else 1.0
