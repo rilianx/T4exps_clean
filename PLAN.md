@@ -1015,6 +1015,18 @@ esas corridas necesitan `--allow-solver`. Los niveles 0.9 y 0.98 del primer
 intento siguen siendo válidos como lo que son: con este orden, a umbral alto el
 motor no para hasta resolver γ y acierta.
 
+#### A/B: impacto medido sobre el output vs sobre el prefijo (en curso)
+
+`Engine(impact_on="output")`: el impacto de una estrategia se mide sobre la
+likelihood del *output* — lo que la regla de parada certifica — en vez de sobre el
+prefijo de decisiones creído. Mismas semillas (30–39), `confidence=0.98`, contra el
+oráculo. Resultado provisional con 5 parejas completas: **output gana 5/5**, 5727 vs
+7151 ejecuciones de media (−20%; speedup 3.67× vs 2.94×), todas correctas. Contrapartida:
+pasa más iteraciones con L=0 (3–24 vs 0–2) — va directo a lo que cambia la respuesta y
+tolera una likelihood baja más tiempo en vez de afirmar primero las decisiones
+tempranas. Las otras 5 semillas exploraron `a=8.0;b=1.0;γ=0.4` más profundo que el
+oráculo (cuarto top-up, a 165) y se re-juegan. Datos en `runs/ab_impact.json`.
+
 #### Integración al paquete (0.2.0)
 
 Los cuatro arreglos están en `t4exps/`: `estimator="paired"` es ahora el de dos

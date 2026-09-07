@@ -224,6 +224,25 @@ footer{border-top:1px solid var(--rule);padding-top:24px;
   </figure>
 </section>
 
+<!-- ===================== A/B IMPACTO ===================== -->
+<section id="sec-ab">
+  <div class="head">
+    <p class="eyebrow">Selección · Engine(impact_on="output") vs "prefix" · runs/ab_impact.json</p>
+    <h2>Medir el impacto sobre el output, no sobre el prefijo</h2>
+    <p>El impacto original de una estrategia es cuánto mueve la likelihood del
+       <em>prefijo de decisiones</em> creído; la regla de parada, en cambio, certifica
+       el <em>output</em>. Medirlo directamente sobre el output evita gastar en
+       decisiones que no cambian la respuesta. Mismas semillas, misma matriz,
+       <code>confidence=0.98</code>.</p>
+  </div>
+  <div class="readout" id="ro-ab"></div>
+  <div class="tablewrap"><table id="t-ab">
+    <thead><tr><th class="n">semilla</th><th class="n">prefijo (runs)</th><th class="n">output (runs)</th>
+      <th class="n">Δ</th><th>correcto p / o</th><th class="n">iteraciones con L=0, p / o</th></tr></thead>
+    <tbody></tbody></table></div>
+  <p id="cap-ab" style="font-size:13.5px;color:var(--ink-3);max-width:74ch"></p>
+</section>
+
 <!-- ===================== CALIBRACION ===================== -->
 <section id="sec-cal">
   <div class="head">
@@ -934,6 +953,30 @@ function tipFor(host, tip) {
     (overAll ? `<strong>Con órdenes aleatorios, ningún umbral queda por debajo de la diagonal</strong> (el IC 95% de la fracción alcanza la L media): la likelihood se comporta como cota inferior de P(correcto).`
       : `<strong>Algún umbral sigue por debajo de la diagonal con órdenes aleatorios</strong> (fila naranja): eso sí sería sobreconfianza del posterior, no artefacto del orden.`) +
     ` Cada réplica usa otro orden estratificado y paga evaluaciones reales cuando explora fuera de lo que el oráculo tiene para ese orden.`;
+})();
+
+/* ---------- 1g. A/B impacto output vs prefijo ---------- */
+(function () {
+  const AB = DATA.ab_impact, sec = document.getElementById("sec-ab");
+  const rows = AB && AB.pairs ? AB.pairs : [];
+  if (!rows.length) { sec.hidden = true; return; }
+  const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
+  const mp = mean(rows.map(r => r.prefix)), mo = mean(rows.map(r => r.output));
+  const wins = rows.filter(r => r.output < r.prefix).length;
+  document.getElementById("ro-ab").innerHTML = [
+    ["parejas", rows.length, ""], ["gana output", `${wins}`, `/ ${rows.length}`],
+    ["runs medios prefijo", mp.toFixed(0), ""], ["runs medios output", mo.toFixed(0), ""],
+    ["Δ medio", `${(100 * (mo / mp - 1)).toFixed(0)}%`, ""],
+    ["speedup", `${(21000 / mp).toFixed(2)}× → ${(21000 / mo).toFixed(2)}×`, ""],
+  ].map(([k, v, u]) => `<div class="cell"><span class="k">${k}</span><span class="v">${v}${u ? ` <small>${u}</small>` : ""}</span></div>`).join("");
+  document.querySelector("#t-ab tbody").innerHTML = rows.map(r =>
+    `<tr><td class="n">${r.seed}</td><td class="n">${r.prefix}</td><td class="n">${r.output}</td>
+      <td class="n">${r.output - r.prefix}</td><td>${r.ok_prefix ? "✓" : "✗"} / ${r.ok_output ? "✓" : "✗"}</td>
+      <td class="n">${r.L0_prefix} / ${r.L0_output}</td></tr>`).join("");
+  const okAll = rows.every(r => r.ok_output);
+  document.getElementById("cap-ab").innerHTML =
+    `${okAll ? "Todas las corridas con impacto sobre el output paran en la referencia." : "<strong>Alguna corrida con impacto sobre el output paró en otra configuración.</strong>"} ` +
+    `Contrapartida visible en la última columna: el criterio por output tolera más iteraciones con likelihood 0 — va directo a lo que cambia la respuesta en vez de afirmar primero las decisiones tempranas.`;
 })();
 
 /* ---------- 1c. ablacion ---------- */
