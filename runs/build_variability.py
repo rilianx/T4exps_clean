@@ -31,6 +31,7 @@ for f in sorted(glob.glob(os.path.join(HERE, "stage3_replay_*_result.json")) + g
     d = json.load(open(f)); e = engine_of(d)
     if not e or not d.get("history"): continue
     tag = re.sub(r"^stage3_(replay_)?|_result\.json$", "", os.path.basename(f))
+    if tag.startswith("replay_calr_") or tag.startswith("cal_") or tag.startswith("ab_out_"): continue   # calibracion / A-B: fuera de la figura de variabilidad
     groups[e].append(dict(tag=tag, seed=d.get("seed", None), runs=d["runs"], speedup=d["speedup"],
                           L=d["likelihood"], output=list(d["output"]), correcto=tuple(d["output"]) == REF,
                           history=[[h[0], h[1]] for h in d["history"]]))
