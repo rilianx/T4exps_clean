@@ -156,6 +156,12 @@ for f in sorted(glob.glob(str(R / "stage3_replay_imp_k3_solver_s*_result.json"))
 vp = R / "variability.json"
 d["variability"] = json.loads(vp.read_text()) if vp.exists() else None
 
+# --- calibracion: fraccion correcta vs likelihood reportada, por umbral -------- #
+cp_ = R / "calibration.json"
+d["calibration"] = json.loads(cp_.read_text()) if cp_.exists() else None
+crp_ = R / "calibration_random.json"
+d["calibration_random"] = json.loads(crp_.read_text()) if crp_.exists() else None
+
 # --- anotaciones de la trayectoria (sobrevivientes por punto) ---------------- #
 ap = R / "annotations.json"
 d["annot"] = json.loads(ap.read_text()) if ap.exists() else {}

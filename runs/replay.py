@@ -30,7 +30,9 @@ p.add_argument("--tolerance", type=float, default=0.0116)
 p.add_argument("--nsims", type=int, default=400)
 p.add_argument("--nruns", type=int, default=15)
 p.add_argument("--batch", type=int, default=25)
-p.add_argument("--seed", type=int, default=0)
+p.add_argument("--seed", type=int, default=0, help="semilla del Monte Carlo y de la imputacion")
+p.add_argument("--order-seed", type=int, default=0,
+               help="semilla de la ESTRATIFICACION (orden de instancias). Para calibrar hay que variarla: con un orden fijo todas las replicas ven el mismo prefijo")
 p.add_argument("--limit", type=int, default=0)
 p.add_argument("--allow-solver", action="store_true")
 p.add_argument("--jobs", type=int, default=1, help="n_jobs del solver real en los cache miss")
@@ -46,7 +48,7 @@ p.add_argument("--honest", action="store_true",
 a = p.parse_args()
 
 pool = [l.strip() for l in open(ROOT / "runs" / "instances_abs.txt") if l.strip()]
-inst = order_instances(pool, "stratified", seed=0)
+inst = order_instances(pool, "stratified", seed=a.order_seed)
 if a.limit:
     inst = inst[: a.limit]
 
@@ -76,7 +78,7 @@ print(f"  cache hits={r.hits}  misses={r.misses}  (solver real: {'si' if a.allow
     "tag": a.tag, "output": list(res.output), "likelihood": res.likelihood, "runs": res.runs,
     "sequential_runs": res.sequential_runs, "speedup": res.speedup, "wasted_runs": res.wasted_runs,
     "hits": r.hits, "misses": r.misses, "confidence": a.confidence, "tolerance": a.tolerance,
-    "nsims": a.nsims, "nsims_confirm": a.nsims_confirm, "impact_on": a.impact_on, "impute_scale": a.impute_scale, "seed": a.seed, "oracle": a.oracle,
+    "nsims": a.nsims, "nsims_confirm": a.nsims_confirm, "impact_on": a.impact_on, "order_seed": a.order_seed, "impute_scale": a.impute_scale, "seed": a.seed, "oracle": a.oracle,
     "honest": a.honest or a.impute, "impute": a.impute, "estimator": a.estimator,
     "estimator_class": type(eng.estimator).__name__, "t4exps_version": t4exps.__version__,
     "history": [[s.runs, s.likelihood, s.state_depth, s.alive] for s in res.history]}, indent=1))

@@ -987,6 +987,34 @@ certifica el *output* (no cada decisión) y el modelo pareado comparte los efect
 de instancia conocidos. La asignación va donde está la información: `β=1.0/2.0`
 ~1150 cada una, `γ=0.2/0.3/0.4` 870–1140, perdedores claros en 15–65.
 
+#### Calibración: el orden de las instancias es la variable aleatoria
+
+Primer intento (`runs/stage3_cal_*`): 20 semillas Monte Carlo por umbral, orden
+estratificado fijo (`seed=0`). Resultado completo (18 réplicas por umbral; 2 murieron
+por *cache miss* pidiendo `a=8.0;b=0.5;γ=0.4;p=0.02` más profundo):
+
+| confidence | correctas | fracción | L media al parar | runs medios |
+|---:|---:|---:|---:|---:|
+| 0.6 | 0/18 | 0.00 | 0.615 | 1800 |
+| 0.8 | 2/18 | 0.11 | 0.809 | 2541 |
+| 0.9 | 14/18 | 0.78 | 0.913 | 5279 |
+| 0.98 | 18/18 | 1.00 | 0.983 | 7078 |
+
+Todas las incorrectas dan γ=0.3.
+Parece sobreconfianza brutal, **pero no mide lo que dice medir**: todas las
+réplicas comparten el mismo prefijo de instancias, y en las primeras ~15 γ=0.3
+va +0.20 pp arriba por azar (el cruce a favor de γ=0.4 llega en N≈126). La semilla
+sólo mueve el Monte Carlo, no los datos; 0/18 es *una* realización del orden,
+repetida. Un posterior perfectamente calibrado también daría ~97% a γ=0.3 con esas
+15 instancias — la verdad es una sorpresa de ~2σ respecto al prefijo.
+
+Consecuencia: **calibrar exige aleatorizar la estratificación** (`--order-seed` en
+`runs/replay.py`), no la semilla del Monte Carlo. Con orden aleatorio, las ramas
+exploradas (α=8.0 …) están en el oráculo sólo para el orden por defecto, así que
+esas corridas necesitan `--allow-solver`. Los niveles 0.9 y 0.98 del primer
+intento siguen siendo válidos como lo que son: con este orden, a umbral alto el
+motor no para hasta resolver γ y acierta.
+
 #### Integración al paquete (0.2.0)
 
 Los cuatro arreglos están en `t4exps/`: `estimator="paired"` es ahora el de dos

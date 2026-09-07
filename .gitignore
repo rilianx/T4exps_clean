@@ -26,3 +26,6 @@ runs/*FOREIGN.csv
 runs/stage3_replay_*_evals.csv
 runs/stage3_var_*_evals.csv
 !runs/stage3_replay_*_solver_*_evals.csv
+# calibracion y A/B: evaluaciones servidas del oraculo, regenerables; se versionan solo los result.json
+runs/stage3_cal_*_evals.csv
+runs/stage3_ab_*_evals.csv

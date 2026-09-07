@@ -224,6 +224,50 @@ footer{border-top:1px solid var(--rule);padding-top:24px;
   </figure>
 </section>
 
+<!-- ===================== CALIBRACION ===================== -->
+<section id="sec-cal">
+  <div class="head">
+    <p class="eyebrow">Motor con los cuatro arreglos · 20 semillas por umbral · runs/calibration.json</p>
+    <h2>¿El 98% es una probabilidad?</h2>
+    <p>La misma matriz y el mismo motor, parando a distintos umbrales de
+       <code>confidence</code>. Si la likelihood es honesta, la fracción de
+       corridas que paran en la referencia debe quedar <strong>en o por encima</strong>
+       de la likelihood reportada al parar (es una cota inferior).</p>
+    <p><strong>Ojo con el primer estudio (puntos y tabla de abajo): el orden de
+       instancias es fijo.</strong> Todas las réplicas comparten el mismo prefijo, y en
+       las primeras ~15 instancias γ=0.3 va +0.20 pp arriba por azar (el cruce a favor
+       de γ=0.4 llega en N≈126). La semilla sólo mueve el Monte Carlo: 0/18 a
+       <code>confidence=0.6</code> no es una probabilidad, es <em>una</em> realización
+       del orden repetida 18 veces — un posterior perfectamente calibrado también
+       diría ~97% γ=0.3 con esas 15 instancias. La calibración que sí mide una
+       probabilidad aleatoriza la estratificación (<code>--order-seed</code>): está
+       en el segundo bloque, que aparece cuando termina.</p>
+  </div>
+  <figure>
+    <div class="plot"><div class="plot-host">
+      <svg id="c-cal" viewBox="0 0 980 360" role="img"
+           aria-label="Fracción de corridas correctas contra likelihood media reportada al parar, por umbral"></svg>
+      <div class="tip" id="tip-cal"></div>
+    </div></div>
+    <figcaption id="cap-cal"></figcaption>
+  </figure>
+  <div class="tablewrap"><table id="t-cal">
+    <thead><tr><th class="n">confidence</th><th class="n">terminadas</th><th class="n">miss</th>
+      <th class="n">correctas</th><th class="n">fracción</th><th class="n">L media al parar</th>
+      <th class="n">runs medios</th><th class="n">speedup medio</th></tr></thead>
+    <tbody></tbody></table></div>
+  <div id="cal-random" hidden>
+    <p class="eyebrow" style="margin-top:22px">Orden de instancias aleatorio por réplica · runs/calibration_random.json</p>
+    <div class="readout" id="ro-calr"></div>
+    <div class="tablewrap" style="margin-top:12px"><table id="t-calr">
+      <thead><tr><th class="n">confidence</th><th class="n">réplicas</th><th class="n">correctas</th>
+        <th class="n">fracción</th><th class="n">IC 95%</th><th class="n">L media al parar</th>
+        <th class="n">runs medios</th><th class="n">evals reales medias</th><th>incorrectas</th></tr></thead>
+      <tbody></tbody></table></div>
+    <p id="cap-calr" style="font-size:13.5px;color:var(--ink-3);max-width:74ch"></p>
+  </div>
+</section>
+
 <!-- ===================== ABLACION ===================== -->
 <section id="sec-ablation">
   <div class="head">
@@ -820,6 +864,76 @@ function tipFor(host, tip) {
       : `<strong>Las ${g.n} semillas pararon en la referencia.</strong>`) +
     ` La banda se estrecha y sube conforme se resuelven α, β y γ; el valle antes del final es γ=0.3 vs 0.4 ` +
     `convirtiéndose en la duda y recibiendo las evaluaciones.`;
+})();
+
+/* ---------- 1e. calibracion ---------- */
+(function () {
+  const Cd = DATA.calibration, sec = document.getElementById("sec-cal");
+  if (!Cd || !Cd.levels) { sec.hidden = true; return; }
+  const levels = Object.keys(Cd.levels).map(k => [parseFloat(k), Cd.levels[k]]).filter(([, g]) => g.n > 0).sort((x, y) => x[0] - y[0]);
+  if (!levels.length) { sec.hidden = true; return; }
+  const svg = document.getElementById("c-cal");
+  const T = tipFor(svg.parentElement, document.getElementById("tip-cal"));
+  const W = 980, H = 360, L = 64, R = 40, TP = 22, B = 60;
+  const pw = W - L - R, ph = H - TP - B;
+  const X = v => L + v * pw, Y = v => TP + (1 - v) * ph;
+  [0, .25, .5, .75, 1].forEach(v => {
+    svg.appendChild(el("line", { x1: L, x2: L + pw, y1: Y(v), y2: Y(v), class: "grid" }));
+    svg.appendChild(el("line", { x1: X(v), x2: X(v), y1: TP, y2: TP + ph, class: "grid" }));
+    let t = el("text", { x: L - 10, y: Y(v) + 4, class: "tick", "text-anchor": "end" }); t.textContent = (v * 100) + "%"; svg.appendChild(t);
+    t = el("text", { x: X(v), y: TP + ph + 20, class: "tick", "text-anchor": "middle" }); t.textContent = (v * 100) + "%"; svg.appendChild(t);
+  });
+  let ax = el("text", { x: L, y: TP + ph + 44, class: "axname" }); ax.textContent = "likelihood media reportada al parar"; svg.appendChild(ax);
+  ax = el("text", { x: L - 10, y: TP - 8, class: "axname", "text-anchor": "end" }); ax.textContent = "fracción correcta"; svg.appendChild(ax);
+  svg.appendChild(el("line", { x1: X(0), y1: Y(0), x2: X(1), y2: Y(1), stroke: "var(--ink-3)", "stroke-width": 1, "stroke-dasharray": "4 4" }));
+  const dl = el("text", { x: X(.62), y: Y(.58), class: "note", fill: "var(--ink-3)" }); dl.textContent = "diagonal: frac = L"; svg.appendChild(dl);
+  const rowsHtml = [];
+  levels.forEach(([c, g]) => {
+    const rows = g.rows || []; const n = rows.length; if (!n) return;
+    const Lm = rows.reduce((s, r) => s + r.L, 0) / n, frac = g.correct / n;
+    const runs = rows.reduce((s, r) => s + r.runs, 0) / n;
+    const sp = 21000 / runs;
+    // intervalo binomial (Wilson 95%) para la fraccion
+    const z = 1.96, ph_ = frac, den = 1 + z * z / n, ctr = (ph_ + z * z / (2 * n)) / den, hw = z * Math.sqrt(ph_ * (1 - ph_) / n + z * z / (4 * n * n)) / den;
+    svg.appendChild(el("line", { x1: X(Lm), x2: X(Lm), y1: Y(Math.max(0, ctr - hw)), y2: Y(Math.min(1, ctr + hw)), stroke: C.s3, "stroke-width": 2, opacity: .6 }));
+    const pt = el("circle", { cx: X(Lm), cy: Y(frac), r: 7, fill: frac + 1e-9 >= Lm ? C.s3 : C.s2, stroke: "var(--surface)", "stroke-width": 2 });
+    pt.addEventListener("mousemove", e => T.show(e, `<b>confidence ${c}</b><br>${g.correct}/${n} correctas (${(frac * 100).toFixed(0)}%)<br>L media al parar ${(Lm * 100).toFixed(1)}%<br>runs medios ${runs.toFixed(0)} · ${sp.toFixed(2)}×${g.miss ? `<br>${g.miss} semillas con cache miss` : ""}`));
+    pt.addEventListener("mouseleave", () => T.hide()); svg.appendChild(pt);
+    const lb = el("text", { x: X(Lm) + 12, y: Y(frac) - 8, class: "dlabel" }); lb.textContent = "c=" + c; svg.appendChild(lb);
+    rowsHtml.push(`<tr class="${frac + 1e-9 >= Lm ? "" : "tie"}"><td class="n">${c}</td><td class="n">${n}</td><td class="n">${g.miss}</td><td class="n">${g.correct}</td><td class="n">${(frac * 100).toFixed(0)}%</td><td class="n">${(Lm * 100).toFixed(1)}%</td><td class="n">${runs.toFixed(0)}</td><td class="n">${sp.toFixed(2)}×</td></tr>`);
+  });
+  document.querySelector("#t-cal tbody").innerHTML = rowsHtml.join("");
+  const over = levels.filter(([c, g]) => g.rows && g.rows.length && g.correct / g.rows.length + 1e-9 >= g.rows.reduce((s, r) => s + r.L, 0) / g.rows.length).length;
+  document.getElementById("cap-cal").innerHTML =
+    `Barras: intervalo de Wilson al 95% para la fracción con n = 20. ` +
+    (over === levels.length ? `<strong>Todos los umbrales quedan en o sobre la diagonal:</strong> la likelihood se comporta como cota inferior, sin sobreconfianza detectable a este n.`
+      : `<strong>${levels.length - over} umbral(es) por debajo de la diagonal</strong> (fila naranja): la likelihood reportada supera la fracción correcta observada.`) +
+    ` Referencia <code>(${Cd.ref.join(", ")})</code>.`;
+})();
+
+/* ---------- 1f. calibracion con orden aleatorio ---------- */
+(function () {
+  const Cr = DATA.calibration_random, box = document.getElementById("cal-random");
+  if (!Cr || !Cr.levels) return;
+  const lv = Object.keys(Cr.levels).map(k => [parseFloat(k), Cr.levels[k]]).filter(([, g]) => g.n > 0).sort((x, y) => x[0] - y[0]);
+  if (!lv.length) return;
+  box.hidden = false;
+  const wilson = (ok, n) => { const z = 1.96, p = ok / n, den = 1 + z * z / n, c = (p + z * z / (2 * n)) / den, h = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / den; return [Math.max(0, c - h), Math.min(1, c + h)]; };
+  let overAll = true;
+  document.querySelector("#t-calr tbody").innerHTML = lv.map(([c, g]) => {
+    const rows = g.rows, n = rows.length, ok = g.correct, frac = ok / n, Lm = rows.reduce((s, r) => s + r.L, 0) / n;
+    const runs = rows.reduce((s, r) => s + r.runs, 0) / n, reals = rows.reduce((s, r) => s + (r.misses || 0), 0) / n;
+    const [lo, hi] = wilson(ok, n), over = hi + 1e-9 >= Lm; overAll = overAll && over;
+    const bad = rows.filter(r => !r.correct).map(r => `o${r.order}→(${r.output.join(", ")})`).join("; ");
+    return `<tr class="${over ? "" : "tie"}"><td class="n">${c}</td><td class="n">${n}</td><td class="n">${ok}</td><td class="n">${(frac * 100).toFixed(0)}%</td><td class="n">[${(lo * 100).toFixed(0)}, ${(hi * 100).toFixed(0)}]</td><td class="n">${(Lm * 100).toFixed(1)}%</td><td class="n">${runs.toFixed(0)}</td><td class="n">${reals.toFixed(0)}</td><td class="num">${bad || "—"}</td></tr>`;
+  }).join("");
+  const tot = lv.reduce((s, [, g]) => s + g.n, 0), okt = lv.reduce((s, [, g]) => s + g.correct, 0);
+  document.getElementById("ro-calr").innerHTML = [["réplicas", tot, ""], ["correctas", `${okt}`, `/ ${tot}`], ["órdenes distintos", new Set(lv.flatMap(([, g]) => g.rows.map(r => r.order))).size, ""]]
+    .map(([k, v, u]) => `<div class="cell"><span class="k">${k}</span><span class="v">${v}${u ? ` <small>${u}</small>` : ""}</span></div>`).join("");
+  document.getElementById("cap-calr").innerHTML =
+    (overAll ? `<strong>Con órdenes aleatorios, ningún umbral queda por debajo de la diagonal</strong> (el IC 95% de la fracción alcanza la L media): la likelihood se comporta como cota inferior de P(correcto).`
+      : `<strong>Algún umbral sigue por debajo de la diagonal con órdenes aleatorios</strong> (fila naranja): eso sí sería sobreconfianza del posterior, no artefacto del orden.`) +
+    ` Cada réplica usa otro orden estratificado y paga evaluaciones reales cuando explora fuera de lo que el oráculo tiene para ese orden.`;
 })();
 
 /* ---------- 1c. ablacion ---------- */
