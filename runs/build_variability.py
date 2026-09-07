@@ -13,9 +13,18 @@ from status import compute as _status, ORDER as _ORDER
 REF = tuple(float(_status("exact")["winner"][k]) for k in _ORDER)
 
 def engine_of(d):
-    if d.get("impute") and d.get("estimator") == "paired_k3": return "arreglado"
-    if not d.get("honest") and not d.get("impute") and d.get("estimator", "paired") == "paired": return "original"
+    if d.get("impute") and estimator_label(d) == "paired_k3": return "arreglado"
+    if not d.get("honest") and not d.get("impute") and estimator_label(d) == "paired_legacy": return "original"
     return None                                  # variantes intermedias: fuera de esta figura
+
+def estimator_label(d):
+    """Antes de la integracion, "paired" era el estimador legado; desde 0.2.0 los
+    result.json llevan estimator_class y "paired" significa K3."""
+    cls = d.get("estimator_class")
+    if cls: return {"PairedEstimatorK3": "paired_k3", "PairedEstimatorK2": "paired_k2",
+                    "PairedEstimatorLegacy": "paired_legacy", "IndependentEstimator": "independent"}.get(cls, cls)
+    e = d.get("estimator", "paired")
+    return "paired_legacy" if e == "paired" else e
 
 groups = {"original": [], "arreglado": []}
 for f in sorted(glob.glob(os.path.join(HERE, "stage3_replay_*_result.json")) + glob.glob(os.path.join(HERE, "stage3_var_*_result.json"))):

@@ -963,6 +963,43 @@ la referencia a 3.11×, nunca pierde la brújula, y gasta 115 evaluaciones reale
 trayectoria de likelihood cae a 7% justo cuando γ pasa a ser la duda, manda las
 evaluaciones a γ=0.3/0.4 y remonta a 98%. **Tres semillas: 3.11×, 2.90×, 3.06×, las tres con la referencia, paradas entre 6745 y 7245** — y las tres exploraron exactamente la misma rama con las mismas 115 evaluaciones reales.
 
+#### Variabilidad de la convergencia (motor con los cuatro arreglos)
+
+`runs/build_variability.py` sobre **23 semillas** re-jugadas contra el oráculo
+(`runs/oracle_extended.csv`: la matriz exacta más las evaluaciones reales que las
+semillas pidieron al explorar la rama α=8.0, 22 550 pares en total):
+
+- **23/23 paran en la referencia** `(4.0, 2.0, 0.4, 0.01)`.
+- Parada: mín 6320, mediana 7045, máx 8120 ejecuciones (±13% alrededor de la
+  mediana; el original paraba entre 235 y 3570, un factor 15, y siempre mal).
+- Speedup: mín 2.59×, mediana 2.98×, máx 3.32×.
+- 21 de las 23 sin una sola iteración en L=0; las otras dos, 1 y 2.
+- La forma es la misma en todas: L sube al resolverse α y β, cae (hasta ~7%) cuando
+  γ=0.3 vs 0.4 pasa a ser la duda y recibe las evaluaciones, y remonta al umbral.
+- Exploración: cada semilla gastó 90–290 evaluaciones *reales* fuera del camino
+  (la sub-rama α=8.0 → β → γ → p), 5–10% de su total. Distintas semillas la
+  recorren a distinta profundidad, por eso el oráculo se completó en dos vueltas
+  (`runs/topup_oracle.py`) y cuatro semillas corrieron con `--allow-solver`.
+
+Contra el trabajo mínimo: si cada comparación se certificara por separado al 98%
+con su SE pareado harían falta ~9355 evaluaciones; el motor para en ~7000 porque
+certifica el *output* (no cada decisión) y el modelo pareado comparte los efectos
+de instancia conocidos. La asignación va donde está la información: `β=1.0/2.0`
+~1150 cada una, `γ=0.2/0.3/0.4` 870–1140, perdedores claros en 15–65.
+
+#### Integración al paquete (0.2.0)
+
+Los cuatro arreglos están en `t4exps/`: `estimator="paired"` es ahora el de dos
+pasos con ANOVA (`PairedEstimatorK3`; el original queda como `"paired_legacy"`),
+y `Engine` tiene `honest_likelihood=True` e `impute_missing=True` por defecto.
+`sequential_execution` acepta `tolerance`, `Result.wasted_runs` pasa a ser "evaluaciones
+en ramas fuera del camino final" (nunca negativo) y `Snapshot.alive` registra las
+simulaciones vivas. Con `estimator="paired_legacy", honest_likelihood=False,
+impute_missing=False` se reproduce el motor original bit a bit, que es lo que
+`runs/replay.py` hace por defecto para que la ablación siga siendo re-jugable.
+Los tests de los defectos D2 y D3 corren sobre ambos: xfail estricto en el legado,
+pasan en el nuevo. Suite: 45 passed, 2 xfailed.
+
 #### Hallazgos operativos
 
 - **`batch` debe ser múltiplo de `n_jobs`.** Con 25 y 8 jobs cada lote son olas

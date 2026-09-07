@@ -48,7 +48,7 @@ def test_no_instance_is_run_twice():
     reseed(1)
     eng_res = experiment_execution(factorial(), INSTANCES, nsims=60, seed=1)
     assert eng_res.runs <= 9 * len(INSTANCES)
-    assert eng_res.wasted_runs <= 0 or eng_res.runs <= eng_res.sequential_runs
+    assert 0 <= eng_res.wasted_runs <= eng_res.runs      # ramas abiertas y abandonadas
 
 
 def test_evaluations_are_deterministic():

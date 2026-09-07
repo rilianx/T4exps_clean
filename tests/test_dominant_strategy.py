@@ -20,7 +20,7 @@ import numpy as np
 import pytest
 
 from t4exps.core import Strategy
-from t4exps.estimators import PairedEstimator
+from t4exps.estimators import PairedEstimator, PairedEstimatorLegacy
 
 N = 400
 A = Strategy("s", "cmd {a}", {"a": 1}).key      # nivel 100.00
@@ -37,8 +37,8 @@ def _evals(depth_c: int, seed: int = 0):
     return {A: series(100.00, 15), B: series(100.05, 15), C: series(99.0, depth_c)}
 
 
-def _diff_draws(evals, nsims=400, seed=0):
-    d = PairedEstimator().draws(evals, N, nsims, np.random.default_rng(seed))
+def _diff_draws(evals, nsims=400, seed=0, est=PairedEstimatorLegacy):
+    d = est().draws(evals, N, nsims, np.random.default_rng(seed))
     return d.sums[d.keys.index(B)] - d.sums[d.keys.index(A)]
 
 
@@ -47,19 +47,21 @@ def test_balanced_posterior_has_spread():
     assert _diff_draws(_evals(15)).std() > 1.0
 
 
-@pytest.mark.xfail(
-    reason="DEFECTO CONOCIDO: cuando una estrategia domina la cobertura "
-           "(casi todas las instancias con k=1), inv_k -> 1 y la solucion de "
-           "componentes de varianza divide por ~0: s_b2 explota y tau2 colapsa "
-           "a 1e-12.  El posterior se vuelve una masa puntual.",
-    strict=True)
-def test_dominant_strategy_keeps_posterior_spread():
+@pytest.mark.parametrize("est", [
+    pytest.param(PairedEstimatorLegacy, marks=pytest.mark.xfail(
+        reason="DEFECTO del legado: con casi todas las instancias en k=1, "
+               "inv_k -> 1, la solucion de componentes divide por ~0 y tau2 "
+               "colapsa a 1e-12: el posterior es una masa puntual.",
+        strict=True), id="legacy"),
+    pytest.param(PairedEstimator, id="paired"),
+])
+def test_dominant_strategy_keeps_posterior_spread(est):
     """Que C tenga 300 evals no deberia volver CIERTA la comparacion A vs B."""
-    assert _diff_draws(_evals(300)).std() > 1.0
+    assert _diff_draws(_evals(300), est=est).std() > 1.0
 
 
-def test_the_defect_is_a_point_mass_not_just_narrow():
-    """Documenta la magnitud: los 400 draws de B-A son literalmente iguales."""
+def test_the_legacy_defect_is_a_point_mass_not_just_narrow():
+    """Documenta la magnitud del defecto legado: los 400 draws de B-A son casi iguales."""
     spread = _diff_draws(_evals(300)).std()
     control = _diff_draws(_evals(15)).std()
     assert spread < control / 1000, f"spread={spread} vs control={control}"

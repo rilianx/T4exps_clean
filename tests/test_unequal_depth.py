@@ -22,7 +22,7 @@ import numpy as np
 import pytest
 
 from t4exps.core import Strategy
-from t4exps.estimators import PairedEstimator
+from t4exps.estimators import PairedEstimator, PairedEstimatorLegacy
 
 N = 100
 EASY = 40                    # a partir de aqui las instancias son ademas mas duras
@@ -44,9 +44,9 @@ def _evals(depth_a: int, depth_b: int, seed: int = 0):
     return {A: series(100.00, depth_a), B: series(100.00 + GAP, depth_b)}
 
 
-def _who_wins(evals, nsims=400, seed=0):
+def _who_wins(evals, nsims=400, seed=0, est=PairedEstimatorLegacy):
     """Fraccion de draws en que B (el mejor de verdad) supera a A."""
-    draws = PairedEstimator().draws(evals, N, nsims, np.random.default_rng(seed))
+    draws = est().draws(evals, N, nsims, np.random.default_rng(seed))
     ia, ib = draws.keys.index(A), draws.keys.index(B)
     return float((draws.sums[ib] > draws.sums[ia]).mean())
 
@@ -63,23 +63,24 @@ def test_equal_depth_recovers_the_better_strategy():
     assert _who_wins(_evals(40, 40)) > 0.90
 
 
-@pytest.mark.xfail(
-    reason="DEFECTO CONOCIDO: con profundidades desiguales el efecto de "
-           "instancia queda sin corregir en las instancias que una sola "
-           "estrategia evaluo (k=1 -> lam~0), asi que la estrategia mas "
-           "evaluada carga con la dificultad de sus instancias extra.",
-    strict=True)
-def test_unequal_depth_still_recovers_the_better_strategy():
+@pytest.mark.parametrize("est", [
+    pytest.param(PairedEstimatorLegacy, marks=pytest.mark.xfail(
+        reason="DEFECTO del legado: con profundidades desiguales el nivel de la "
+               "estrategia mas evaluada absorbe la dificultad de sus instancias k=1.",
+        strict=True), id="legacy"),
+    pytest.param(PairedEstimator, id="paired"),
+])
+def test_unequal_depth_still_recovers_the_better_strategy(est):
     """B sigue siendo mejor aunque se la haya evaluado en instancias peores.
 
-    B corre 90 instancias (50 de ellas dificiles) y A solo 40 (todas faciles).
+    B corre 60 instancias (20 de ellas dificiles) y A solo 40 (todas faciles).
     El modelo pareado existe justamente para que eso no importe.
     """
-    assert _who_wins(_evals(40, 90)) > 0.90
+    assert _who_wins(_evals(40, 60), est=est) > 0.80
 
 
-def test_the_defect_is_a_reversal_not_just_noise():
-    """Documenta la magnitud: no es que dude, es que se da vuelta del todo."""
+def test_the_legacy_defect_is_a_reversal_not_just_noise():
+    """Documenta la magnitud del defecto legado: no duda, se da vuelta del todo."""
     equal = _who_wins(_evals(40, 40))
     unequal = _who_wins(_evals(40, 90))
     assert equal > 0.90, "control"

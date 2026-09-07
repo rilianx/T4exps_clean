@@ -12,7 +12,7 @@ def cartesian_product(*iterables):
 
 
 def sequential_execution(experiment, instances, *, n_jobs: int = 1, timeout=None,
-                         parse=None):
+                         parse=None, tolerance: float = 0.0):
     """Ground truth: every strategy on every instance, no speculation.
 
     This is the baseline the incremental engine must reproduce exactly.
@@ -26,7 +26,7 @@ def sequential_execution(experiment, instances, *, n_jobs: int = 1, timeout=None
 
     class _Seq:
         n_instances = len(instances)
-        tolerance = 0.0
+        tolerance = 0.0          # se fija abajo: la misma regla de empate que el Engine
 
         def ensure_minimum_data(self, s: Strategy):
             missing = len(instances) - runner.count(s)
@@ -37,7 +37,9 @@ def sequential_execution(experiment, instances, *, n_jobs: int = 1, timeout=None
             import numpy as np
 
             v1, v2 = runner.values(s1), runner.values(s2)
-            return s1 if np.mean(v1) >= np.mean(v2) else s2
+            return s1 if np.mean(v1) - np.mean(v2) >= -self.tolerance else s2
+
+    _Seq.tolerance = tolerance
 
     ctx = Context(mode="predict", engine=_Seq())
     set_context(ctx)

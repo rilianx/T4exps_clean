@@ -18,12 +18,21 @@ except Exception as _e:                       # pragma: no cover
 def cell_of(d):
     return "imputa" if d.get("impute") else ("honesto" if d.get("honest") else "sesgado")
 
+def estimator_label(d):
+    """Antes de la integracion, "paired" era el estimador legado; desde 0.2.0 los
+    result.json llevan estimator_class y "paired" significa K3."""
+    cls = d.get("estimator_class")
+    if cls: return {"PairedEstimatorK3": "paired_k3", "PairedEstimatorK2": "paired_k2",
+                    "PairedEstimatorLegacy": "paired_legacy", "IndependentEstimator": "independent"}.get(cls, cls)
+    e = d.get("estimator", "paired")
+    return "paired_legacy" if e == "paired" else e
+
 rows = []
 for f in sorted(glob.glob(os.path.join(HERE, "stage3_replay_*_result.json")) + glob.glob(os.path.join(HERE, "stage3_var_*_result.json"))):
     d = json.load(open(f)); tag = re.sub(r"^stage3_(replay_)?|_result\.json$", "", os.path.basename(f))
     if tag.startswith("var_orig_"): continue        # el motor original quedo descartado; sus 20 semillas no van a la tabla
     m = re.search(r"_s(\d+)$", tag)
-    rows.append(dict(tag=tag, denominador=cell_of(d), estimador=d.get("estimator", "paired"),
+    rows.append(dict(tag=tag, denominador=cell_of(d), estimador=estimator_label(d),
                      seed=int(m.group(1)) if m else 0, runs=d["runs"], speedup=round(d["speedup"], 2),
                      L=round(d["likelihood"], 4), output=list(d["output"]),
                      correcto=tuple(d["output"]) == REF, misses=d.get("misses", 0),
@@ -32,7 +41,7 @@ for tag, f in (("fase1_real", "stage3_phase1_result.json"), ("exacto_intento1", 
     f = os.path.join(HERE, f)
     if os.path.exists(f):
         d = json.load(open(f))
-        rows.append(dict(tag=tag, denominador="sesgado", estimador="paired", seed=0, runs=d["runs"],
+        rows.append(dict(tag=tag, denominador="sesgado", estimador="paired_legacy", seed=0, runs=d["runs"],
                          speedup=round(d["speedup"], 2), L=round(d["likelihood"], 4), output=list(d["output"]),
                          correcto=tuple(d["output"]) == REF, misses=0, solver_real=True))
 json.dump(rows, open(os.path.join(HERE, "ablation.json"), "w"), indent=1)

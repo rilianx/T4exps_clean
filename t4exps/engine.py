@@ -29,6 +29,7 @@ class Snapshot:
     state_depth: int
     selected: Optional[str]
     impact: float
+    alive: int = 0            # simulations that completed (all of them when imputing)
 
 
 @dataclass
@@ -75,6 +76,8 @@ class Engine:
         family=default_family,
         cost_aware: bool = False,
         parse=None,
+        honest_likelihood: bool = True,
+        impute_missing: bool = True,
     ):
         self.experiment = experiment
         instances = order_instances(instances, instance_order, family, seed)
@@ -91,6 +94,16 @@ class Engine:
         self.confidence = confidence
         self.min_state_likelihood = min_state_likelihood
         self.rng = np.random.default_rng(seed)
+        self.seed = seed
+        # Both default on.  honest_likelihood: an aborted simulation counts as
+        # 'did not reproduce the output' instead of being dropped -- dropping
+        # them conditions on agreement and 1/1 = 100%.  impute_missing: a
+        # simulation that reaches a strategy without data draws its total from
+        # a prior instead of aborting, so unexplored branches count as
+        # uncertainty and the impact heuristic can see them.  Both False +
+        # estimator='paired_legacy' reproduces the original engine.
+        self.honest_likelihood = honest_likelihood
+        self.impute_missing = impute_missing
         self.verbose = verbose
         self.history: List[Snapshot] = []
         self._path_runs = 0
@@ -151,6 +164,8 @@ class Engine:
         evals = {k: v for k, v in evals.items() if v}
         return self.estimator.draws(evals, self.n_instances, self.nsims, self.rng)
 
+    ABORT = ("__abort__",)          # never equals a real output or checkpoint
+
     def _run_simulations(self, draws: Draws, override=None, budget=None):
         """Return (states reached, outputs reached) over all simulations."""
         states, outputs = [], []
@@ -158,8 +173,17 @@ class Engine:
             sums = draws.as_dict(sim)
             if override is not None:
                 sums[override[0]] = override[1]
+            if self.impute_missing:
+                col = draws.sums[:, sim]
+                mu = float(col.mean())
+                sd = float(col.std()) if col.size > 1 else 0.0
+                sums = _ImputingSums(sums, np.random.default_rng(self.seed * 100003 + sim),
+                                     mu, max(sd, 1e-9))
             out, ctx = self._simulate_once(sums)
             if out is None:
+                if self.honest_likelihood:
+                    states.append(self.ABORT)
+                    outputs.append(self.ABORT)
                 continue
             states.append(ctx.state())
             outputs.append(_hashable(out))
@@ -238,6 +262,7 @@ class Engine:
                     state_depth=len(probable_state),
                     selected=repr(best_s) if best_s else None,
                     impact=best_impact if best_s else 0.0,
+                    alive=sum(1 for o in outputs if o != self.ABORT),
                 )
             )
             if self.verbose:
@@ -250,11 +275,15 @@ class Engine:
                 # either everything on the path is fully evaluated (exact), or
                 # the user asked to stop at a given degree of certainty
                 needed = self._sequential_runs(involved)
+                # wasted = evaluations spent on strategies that are NOT on the
+                # final decision path (branches opened and abandoned)
+                on_path = {s.key for s in involved}
+                wasted = sum(len(v) for k, v in self.runner.evals.items() if k not in on_path)
                 return Result(
                     output=output,
                     likelihood=1.0 if best_s is None else likelihood,
                     runs=self.runner.total_runs,
-                    wasted_runs=self.runner.total_runs - needed,
+                    wasted_runs=wasted,
                     sequential_runs=needed,
                     history=self.history,
                 )
@@ -263,6 +292,25 @@ class Engine:
     def _sequential_runs(self, involved: List[Strategy]) -> int:
         """How many runs a plain sequential execution would have needed."""
         return len(involved) * self.n_instances
+
+
+class _ImputingSums(dict):
+    """Simulated totals that invent one for a strategy WITHOUT data.
+
+    Drawn from a normal over the known strategies' totals in the same
+    simulation, cached so the value is consistent within the simulation, and
+    seeded per simulation index so the impact counterfactuals see the same
+    imputed values as the base simulation.
+    """
+
+    def __init__(self, base, rng, mu, sd):
+        super().__init__(base)
+        self._rng, self._mu, self._sd = rng, mu, sd
+
+    def __missing__(self, key):
+        v = float(self._mu + self._rng.standard_normal() * self._sd)
+        self[key] = v
+        return v
 
 
 def _hashable(x):

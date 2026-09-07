@@ -30,7 +30,7 @@ For the tests and the figure scripts:
 
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest tests -q          # 43 tests + 2 expected failures, ~23 s
+python -m pytest tests -q          # 45 tests + 2 expected failures (legacy estimator), ~35 s
 ```
 
 ---
@@ -60,7 +60,7 @@ Run the same experiment without speculation to get the baseline:
 
 ```python
 from t4exps import sequential_execution
-truth, runs = sequential_execution(experiment, "instances.txt")
+truth, runs = sequential_execution(experiment, "instances.txt", tolerance=0.0)   # same tie rule as the engine
 ```
 
 ### Parameters and command templates
@@ -127,8 +127,10 @@ Passed as keyword arguments to `experiment_execution`.
 
 | option | default | what it does |
 |---|---|---|
-| `estimator` | `"paired"` | `"paired"` cancels instance difficulty between strategies; `"independent"` reproduces the classic per-strategy model. See [NOTES.md](NOTES.md). |
-| `confidence` | `1.0` | Stop as soon as the reported likelihood reaches this. **Without it the run only saves time-to-answer, not executions** — exactness requires evaluating everything. See *Known defects*: with the current likelihood denominator a single surviving simulation reports 100 % and satisfies even `confidence=1.0`; pass `confidence=2.0` to force exhaustion. |
+| `estimator` | `"paired"` | `"paired"` cancels instance difficulty between strategies (levels from the shared instance block, residual variance by two-way ANOVA); `"independent"` is the classic per-strategy model; `"paired_legacy"` is the pre-0.2 paired model, kept to reproduce the ablation in [PLAN.md](PLAN.md). See [NOTES.md](NOTES.md). |
+| `honest_likelihood` | `True` | A simulation that aborts counts as *not reproducing the output*. With `False` (pre-0.2 behaviour) aborted simulations are dropped, which conditions the likelihood on agreement — 1/1 reads as 100 %. |
+| `impute_missing` | `True` | A simulation that reaches a strategy without data draws its total from a prior over the known strategies instead of aborting, so unexplored branches count as uncertainty and the impact heuristic can point at them. `False` reproduces the pre-0.2 behaviour. |
+| `confidence` | `1.0` | Stop as soon as the reported likelihood reaches this. **Without it the run only saves time-to-answer, not executions** — exactness requires evaluating everything. |
 | `tolerance` | `0.0` | Differences below this count as a tie. Keeps the engine from burning thousands of runs separating strategies that differ by less than the standard error. |
 | `nruns` | `10` | Executions given to a strategy the first time it appears. |
 | `batch` | `10` | Executions added each iteration to the selected strategy. |
@@ -153,7 +155,8 @@ res.likelihood        # degree of certainty (1.0 if run to completion)
 res.runs              # executions actually performed
 res.sequential_runs   # what a sequential run would have needed
 res.speedup
-res.history           # per-iteration log: runs, output, likelihood, selected...
+res.wasted_runs       # executions on strategies not on the final decision path
+res.history           # per-iteration log: runs, output, likelihood, alive, selected...
 ```
 
 `res.history` is the data behind every figure in `figures/`.
@@ -235,11 +238,12 @@ experiment_execution(
 - Engine overhead grows with the number of strategies. On very fast solvers the
   machinery can cost more than it saves; measure before trusting the speed-up.
 
-### Known defects (measured on BSG_CLP / BR1–BR15, September 2026)
+### Defects found and fixed in 0.2 (measured on BSG_CLP / BR1–BR15, September 2026)
 
-Found while running the plan in [PLAN.md](PLAN.md); each one is reproducible
-and the fixes exist as drop-in variants under `runs/` but are **not yet merged
-into the package**.
+Found while running the plan in [PLAN.md](PLAN.md). All four are fixed in the
+package as of 0.2.0 — the defaults below are the fixed behaviour; the original
+is still reachable as `estimator="paired_legacy", honest_likelihood=False,
+impute_missing=False` so the ablation stays reproducible.
 
 1. **Likelihood denominator** (`engine.py`, `_run_simulations`/`run`). The
    likelihood is *matches / surviving simulations*; simulations that reach a
@@ -248,28 +252,29 @@ into the package**.
    estimate is biased upward, and 1/1 = 100 % satisfies any `confidence`. On BR
    the original engine stopped 7 times out of 7 with ≥ 98 % reported confidence
    and the wrong γ (20 more seeds: 0/20 correct). Fix: count aborted simulations
-   as non-matching (`HonestEngine` in `runs/replay.py`).
+   as non-matching (`honest_likelihood=True`).
 2. **Unequal depths** (`tests/test_unequal_depth.py`, strict xfail). The paired
    estimator takes a strategy's level from *all* its observations; a strategy
    evaluated deeper absorbs the difficulty of instances nobody else saw, and the
    posterior can invert (0 % for the truly better strategy at 40 vs 90 evals).
    Fix: levels from the shared block only, instance effects as residuals
-   (`paired_k2`/`paired_k3` in `runs/estimators_fixed.py`).
+   (now the default `"paired"`; `PairedEstimatorK2` keeps the intermediate variant).
 3. **Dominant strategy** (`tests/test_dominant_strategy.py`, strict xfail). When
    almost every seen instance has `k=1`, the variance-component solve divides by
    `1 − mean(1/k) → 0`, `tau²` collapses to `1e-12` and the posterior becomes a
    point mass: 400/400 simulations agree on 15 data points. Fix: components from
-   the shared block, residual by two-way ANOVA (`paired_k3`).
+   the shared block, residual by two-way ANOVA (now the default `"paired"`).
 4. **The compass goes dark.** Impact is measured against the believed prefix of
    decisions; when the disagreeing simulations abort, survival → 0, depth → 0,
    every impact → 0, and the tie falls to code order — the engine hammers the
    first strategy in the sweep to completion. Fix: impute a prior total for
-   strategies without data instead of aborting (`ImputingEngine`,
-   `runs/replay.py --impute`).
+   strategies without data instead of aborting (`impute_missing=True`).
 
-With all four fixes the engine reached the reference configuration in 23/23
-seeds at 2.6–3.3× fewer executions than the sequential sweep; the original
-engine's 6–89× speed-ups occurred only in runs that stopped on the wrong answer.
+With all four fixes the engine reached the reference configuration in every
+seed tried (23/23; see `runs/variability.json`) at 2.6–3.3×
+fewer executions than the sequential sweep, never losing the compass; the
+original engine's 6–89× speed-ups occurred only in runs that stopped on the
+wrong answer.
 
 ---
 
@@ -283,7 +288,7 @@ t4exps/
   engine.py       the incremental speculative execution loop
   utils.py        sequential baseline, instance ordering, cartesian_product
 examples/         dummy solver, factorial design, calibration, figures, BSG
-tests/            43 tests + 2 strict xfails documenting defects 2 and 3
+tests/            45 tests + 2 strict xfails documenting the legacy estimator's defects
 figures/          PDF + PNG, regenerate with examples/make_figures.py
 runs/             BSG campaign: per-evaluation CSVs, the 21 745-row matrix used as
                   oracle, replay/ablation/variability tooling, status & close scripts
