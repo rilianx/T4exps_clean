@@ -238,7 +238,7 @@ footer{border-top:1px solid var(--rule);padding-top:24px;
   <div class="readout" id="ro-ab"></div>
   <div class="tablewrap"><table id="t-ab">
     <thead><tr><th class="n">semilla</th><th class="n">prefijo (runs)</th><th class="n">output (runs)</th>
-      <th class="n">Δ</th><th>correcto p / o</th><th class="n">iteraciones con L=0, p / o</th></tr></thead>
+      <th class="n">auto (runs)</th><th>correcto p / o / a</th><th class="n">iteraciones con L=0, p / o / a</th></tr></thead>
     <tbody></tbody></table></div>
   <p id="cap-ab" style="font-size:13.5px;color:var(--ink-3);max-width:74ch"></p>
 </section>
@@ -969,14 +969,23 @@ function tipFor(host, tip) {
     ["Δ medio", `${(100 * (mo / mp - 1)).toFixed(0)}%`, ""],
     ["speedup", `${(21000 / mp).toFixed(2)}× → ${(21000 / mo).toFixed(2)}×`, ""],
   ].map(([k, v, u]) => `<div class="cell"><span class="k">${k}</span><span class="v">${v}${u ? ` <small>${u}</small>` : ""}</span></div>`).join("");
+  const hasAuto = rows.some(r => r.auto !== undefined);
   document.querySelector("#t-ab tbody").innerHTML = rows.map(r =>
     `<tr><td class="n">${r.seed}</td><td class="n">${r.prefix}</td><td class="n">${r.output}</td>
-      <td class="n">${r.output - r.prefix}</td><td>${r.ok_prefix ? "✓" : "✗"} / ${r.ok_output ? "✓" : "✗"}</td>
-      <td class="n">${r.L0_prefix} / ${r.L0_output}</td></tr>`).join("");
+      <td class="n">${r.auto !== undefined ? r.auto : "—"}</td>
+      <td>${r.ok_prefix ? "✓" : "✗"} / ${r.ok_output ? "✓" : "✗"} / ${r.auto !== undefined ? (r.ok_auto ? "✓" : "✗") : "—"}</td>
+      <td class="n">${r.L0_prefix} / ${r.L0_output} / ${r.auto !== undefined ? r.L0_auto : "—"}</td></tr>`).join("");
+  if (hasAuto) {
+    const both = rows.filter(r => r.auto !== undefined), ma = mean(both.map(r => r.auto)), mpb = mean(both.map(r => r.prefix));
+    document.getElementById("ro-ab").innerHTML += [["auto: runs medios", ma.toFixed(0), ""], ["auto vs prefijo", `${(100 * (ma / mpb - 1)).toFixed(0)}%`, `gana ${both.filter(r => r.auto < r.prefix).length}/${both.length}`],
+      ["auto: L=0 máx", Math.max(...both.map(r => r.L0_auto)), "iteraciones"]]
+      .map(([k, v, u]) => `<div class="cell"><span class="k">${k}</span><span class="v">${v}${u ? ` <small>${u}</small>` : ""}</span></div>`).join("");
+  }
   const okAll = rows.every(r => r.ok_output);
   document.getElementById("cap-ab").innerHTML =
     `${okAll ? "Todas las corridas con impacto sobre el output paran en la referencia." : "<strong>Alguna corrida con impacto sobre el output paró en otra configuración.</strong>"} ` +
-    `Contrapartida visible en la última columna: el criterio por output tolera más iteraciones con likelihood 0 — va directo a lo que cambia la respuesta en vez de afirmar primero las decisiones tempranas.`;
+    `<strong>Bimodal:</strong> cuando la respuesta ya está a la vista el criterio por output ahorra ~20%; cuando ninguna simulación reproduce el output (L=0) su base es 1e-9, todo impacto satura en 1.0 y gana el orden de código — corridas con 57–244 iteraciones en L=0 y hasta 12 865 ejecuciones. ` +
+    (hasAuto ? `<code>auto</code> usa output cuando L ≥ 0.05 y prefijo si no.` : `El híbrido <code>auto</code> (output si L ≥ 0.05, prefijo si no) está en curso.`);
 })();
 
 /* ---------- 1c. ablacion ---------- */
