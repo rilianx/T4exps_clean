@@ -15,7 +15,7 @@ if pr: print(f"  pares {len(pr)}: prefijo {st.mean(pr):.0f} vs output {st.mean(o
 # tercera variante: hibrido auto (output si L>=0.05, prefijo si no)
 au=[]; print("\n  --- auto (hibrido) ---")
 for sd in range(30,40):
-    c=load(f"{HERE}/ab_auto_s{sd}_result.json")
+    c=load(f"{HERE}/stage3_ab_auto_s{sd}_result.json")
     if c:
         r=next((x for x in rows if x["seed"]==sd), None)
         z=sum(1 for h in c["history"] if h[1]==0)
