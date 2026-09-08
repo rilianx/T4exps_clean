@@ -129,6 +129,7 @@ Passed as keyword arguments to `experiment_execution`.
 |---|---|---|
 | `estimator` | `"paired"` | `"paired"` cancels instance difficulty between strategies (levels from the shared instance block, residual variance by two-way ANOVA); `"independent"` is the classic per-strategy model; `"paired_legacy"` is the pre-0.2 paired model, kept to reproduce the ablation in [PLAN.md](PLAN.md). See [NOTES.md](NOTES.md). |
 | `honest_likelihood` | `True` | A simulation that aborts counts as *not reproducing the output*. With `False` (pre-0.2 behaviour) aborted simulations are dropped, which conditions the likelihood on agreement — 1/1 reads as 100 %. |
+| `impact_on` | `"auto"` | How the next strategy to evaluate is chosen. `"output"` measures a strategy's impact on the likelihood of the *output* (what the stopping rule certifies); `"prefix"` on the believed prefix of decisions (pre-0.3); `"auto"` uses output once the likelihood is informative (≥ 0.05) and prefix before — on BR: 10/10 correct, 12 % fewer executions than prefix, no blind stretches. |
 | `impute_missing` | `True` | A simulation that reaches a strategy without data draws its total from a prior over the known strategies instead of aborting, so unexplored branches count as uncertainty and the impact heuristic can point at them. `False` reproduces the pre-0.2 behaviour. |
 | `confidence` | `1.0` | Stop as soon as the reported likelihood reaches this. **Without it the run only saves time-to-answer, not executions** — exactness requires evaluating everything. |
 | `tolerance` | `0.0` | Differences below this count as a tie. Keeps the engine from burning thousands of runs separating strategies that differ by less than the standard error. |
@@ -241,7 +242,7 @@ experiment_execution(
 ### Defects found and fixed in 0.2 (measured on BSG_CLP / BR1–BR15, September 2026)
 
 Found while running the plan in [PLAN.md](PLAN.md). All four are fixed in the
-package as of 0.2.0 — the defaults below are the fixed behaviour; the original
+package as of 0.2.0 (0.3.0 adds `impact_on="auto"` as default) — the defaults below are the fixed behaviour; the original
 is still reachable as `estimator="paired_legacy", honest_likelihood=False,
 impute_missing=False` so the ablation stays reproducible.
 

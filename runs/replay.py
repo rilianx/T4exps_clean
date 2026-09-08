@@ -42,7 +42,7 @@ p.add_argument("--impute", action="store_true",
                help="estrategias sin datos se imputan del prior en vez de abortar (implica honesto)")
 p.add_argument("--impute-scale", type=float, default=1.0, help="ancho del prior de imputacion (x sd)")
 p.add_argument("--nsims-confirm", type=int, default=None, help="re-estimar la likelihood con N sims cerca del umbral")
-p.add_argument("--impact-on", default="prefix", choices=["prefix","output","auto"])
+p.add_argument("--impact-on", default="auto", choices=["prefix","output","auto"], help="default auto (0.3); prefix reproduce los replays de 0.2")
 p.add_argument("--honest", action="store_true",
                help="denominador de la likelihood = simulaciones intentadas")
 a = p.parse_args()

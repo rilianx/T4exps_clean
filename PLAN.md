@@ -1015,6 +1015,33 @@ esas corridas necesitan `--allow-solver`. Los niveles 0.9 y 0.98 del primer
 intento siguen siendo válidos como lo que son: con este orden, a umbral alto el
 motor no para hasta resolver γ y acierta.
 
+#### Calibración honesta: órdenes de instancias aleatorios
+
+`runs/replay.py --order-seed 1..8`, `confidence` ∈ {0.8, 0.98}, motor arreglado con el
+default de 0.2 (`impact_on="prefix"`), solver para los pares fuera del oráculo (cada
+réplica pagó 700–900 evaluaciones reales explorando bajo su orden; el oráculo pasó a
+29 279 pares y 98 estrategias). `runs/calibration_random.json`.
+
+| confidence | réplicas | correctas | fracción | IC 95% (Wilson) | L media al parar | runs | reales | incorrectas |
+|---:|---:|---:|---:|---|---:|---:|---:|---|
+| 0.8 | 8 | 4 | 0.50 | [0.22, 0.78] | 0.824 | 3416 | 700 | o1, o3, o4, o5 |
+| 0.98 | 8 | 7 | 0.88 | [0.53, 0.98] | 0.984 | 6870 | 888 | o3 |
+
+**Lectura.** A 0.8 el intervalo excluye la L reportada (0.824): **sobreconfianza real
+del posterior**, ya sin el artefacto del orden fijo. A 0.98 el punto está debajo
+(0.88) pero el IC lo cubre con n=8; el único fallo (orden 3) paró con L 0.988 en 4425
+ejecuciones sin haber explorado nada, es decir, seguro y equivocado en γ. Todas las
+incorrectas dan γ=0.3, la comparación más apretada (+0.024 pp, 2.6 SE a N=1500).
+
+**Candidato a D5.** El estimador pareado usa `tau2` como *plug-in* (sin incertidumbre)
+y un posterior normal para el nivel; con 15–65 instancias compartidas en γ, eso
+infla la z de una diferencia pequeña (medido antes: z 2.45 vs 1.65 con el tau2 real).
+Arreglo natural: posterior t (o Normal-Inverse-Gamma como ya hace `independent`)
+para el nivel y la diferencia, con los grados de libertad del bloque compartido.
+Ninguno de los cuatro arreglos de 0.2 ni el híbrido `auto` tocan esto. La medida de
+éxito ya está montada: repetir esta misma calibración y ver la fracción subir hasta la
+diagonal.
+
 #### A/B: impacto medido sobre el output vs sobre el prefijo
 
 `Engine(impact_on="output")`: el impacto de una estrategia se mide sobre la
