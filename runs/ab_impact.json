@@ -1,0 +1,82 @@
+{
+ "ref": [
+  4.0,
+  2.0,
+  0.4,
+  0.01
+ ],
+ "pairs": [
+  {
+   "seed": 30,
+   "prefix": 6420,
+   "output": 5730,
+   "ok_prefix": true,
+   "ok_output": true,
+   "L0_prefix": 0,
+   "L0_output": 6
+  },
+  {
+   "seed": 33,
+   "prefix": 7385,
+   "output": 5780,
+   "ok_prefix": true,
+   "ok_output": true,
+   "L0_prefix": 0,
+   "L0_output": 17
+  },
+  {
+   "seed": 34,
+   "prefix": 7385,
+   "output": 5765,
+   "ok_prefix": true,
+   "ok_output": true,
+   "L0_prefix": 0,
+   "L0_output": 24
+  },
+  {
+   "seed": 35,
+   "prefix": 7195,
+   "output": 6380,
+   "ok_prefix": true,
+   "ok_output": true,
+   "L0_prefix": 2,
+   "L0_output": 22
+  },
+  {
+   "seed": 36,
+   "prefix": 6995,
+   "output": 7930,
+   "ok_prefix": true,
+   "ok_output": true,
+   "L0_prefix": 1,
+   "L0_output": 57
+  },
+  {
+   "seed": 37,
+   "prefix": 7370,
+   "output": 4980,
+   "ok_prefix": true,
+   "ok_output": true,
+   "L0_prefix": 0,
+   "L0_output": 3
+  },
+  {
+   "seed": 38,
+   "prefix": 7810,
+   "output": 6080,
+   "ok_prefix": true,
+   "ok_output": true,
+   "L0_prefix": 0,
+   "L0_output": 7
+  },
+  {
+   "seed": 39,
+   "prefix": 7245,
+   "output": 9985,
+   "ok_prefix": true,
+   "ok_output": true,
+   "L0_prefix": 0,
+   "L0_output": 131
+  }
+ ]
+}

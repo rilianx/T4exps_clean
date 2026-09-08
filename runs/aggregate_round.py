@@ -12,7 +12,21 @@ for sd in range(30,40):
     print(f"  s{sd}: prefijo {(a['runs'] if a else '—'):>5}  output {(b['runs'] if b else '—'):>5}  ok {('✓' if a and tuple(a['output'])==REF else '—')}/{('✓' if b and tuple(b['output'])==REF else ('✗' if b else '—'))}  L0 {z(a)}/{z(b)}")
     if a and b: pr.append(a["runs"]); ou.append(b["runs"]); rows.append(dict(seed=sd,prefix=a["runs"],output=b["runs"],ok_prefix=tuple(a["output"])==REF,ok_output=tuple(b["output"])==REF,L0_prefix=z(a),L0_output=z(b)))
 if pr: print(f"  pares {len(pr)}: prefijo {st.mean(pr):.0f} vs output {st.mean(ou):.0f}  delta {100*(st.mean(ou)/st.mean(pr)-1):+.0f}%  output gana {sum(o<p for p,o in zip(pr,ou))}/{len(pr)}  speedup {21000/st.mean(pr):.2f}x -> {21000/st.mean(ou):.2f}x")
-json.dump(dict(ref=list(REF),pairs=rows),open(f"{HERE}/ab_impact.json","w"),indent=1)
+# tercera variante: hibrido auto (output si L>=0.05, prefijo si no)
+au=[]; print("\n  --- auto (hibrido) ---")
+for sd in range(30,40):
+    c=load(f"{HERE}/ab_auto_s{sd}_result.json")
+    if c:
+        r=next((x for x in rows if x["seed"]==sd), None)
+        z=sum(1 for h in c["history"] if h[1]==0)
+        print(f"  s{sd}: auto {c['runs']:>5}  ok {'✓' if tuple(c['output'])==REF else '✗'}  L0 {z}" + (f"   (prefijo {r['prefix']}, output {r['output']})" if r else ""))
+        au.append(dict(seed=sd,auto=c["runs"],ok_auto=tuple(c["output"])==REF,L0_auto=z))
+        if r: r.update(auto=c["runs"],ok_auto=tuple(c["output"])==REF,L0_auto=z)
+if au:
+    both=[x for x in rows if "auto" in x]
+    if both: print(f"  auto vs prefijo ({len(both)} pares): {st.mean(x['auto'] for x in both):.0f} vs {st.mean(x['prefix'] for x in both):.0f} ({100*(st.mean(x['auto'] for x in both)/st.mean(x['prefix'] for x in both)-1):+.0f}%), auto gana {sum(x['auto']<x['prefix'] for x in both)}/{len(both)}; vs output: auto gana {sum(x['auto']<x['output'] for x in both)}/{len(both)}")
+    print(f"  auto: {len(au)} corridas, {sum(x['ok_auto'] for x in au)} correctas, runs medios {st.mean(x['auto'] for x in au):.0f}, L0 max {max(x['L0_auto'] for x in au)}")
+json.dump(dict(ref=list(REF),pairs=rows,auto=au),open(f"{HERE}/ab_impact.json","w"),indent=1)
 print("\n=== calibracion honesta: ordenes aleatorios ===")
 out={}
 print(f"  {'conf':>5} {'n':>3} {'ok':>3} {'frac':>5} {'IC95':>13} {'L media':>8} {'runs':>6} {'reales':>7}  incorrectas")

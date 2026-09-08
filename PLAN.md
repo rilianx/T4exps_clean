@@ -1015,17 +1015,27 @@ esas corridas necesitan `--allow-solver`. Los niveles 0.9 y 0.98 del primer
 intento siguen siendo válidos como lo que son: con este orden, a umbral alto el
 motor no para hasta resolver γ y acierta.
 
-#### A/B: impacto medido sobre el output vs sobre el prefijo (en curso)
+#### A/B: impacto medido sobre el output vs sobre el prefijo
 
 `Engine(impact_on="output")`: el impacto de una estrategia se mide sobre la
 likelihood del *output* — lo que la regla de parada certifica — en vez de sobre el
 prefijo de decisiones creído. Mismas semillas (30–39), `confidence=0.98`, contra el
-oráculo. Resultado provisional con 5 parejas completas: **output gana 5/5**, 5727 vs
-7151 ejecuciones de media (−20%; speedup 3.67× vs 2.94×), todas correctas. Contrapartida:
-pasa más iteraciones con L=0 (3–24 vs 0–2) — va directo a lo que cambia la respuesta y
-tolera una likelihood baja más tiempo en vez de afirmar primero las decisiones
-tempranas. Las otras 5 semillas exploraron `a=8.0;b=1.0;γ=0.4` más profundo que el
-oráculo (cuarto top-up, a 165) y se re-juegan. Datos en `runs/ab_impact.json`.
+oráculo; 5 semillas necesitaron solver porque exploran la rama (α=8.0, β=1.0) más
+profundo que el oráculo (50–150 evaluaciones reales cada una).
+
+**Resultado: bimodal.** Las 10 corridas por output son correctas. En las 8 parejas
+comparables, output gana 6/8 y ahorra de media 9%
+(7226 → 6579; speedup 2.91× → 3.19×). Pero cuando funciona
+ahorra ~20% (4980–6380) y cuando falla se dispara (7930–12865), y esas corridas pasan
+**57–244 iteraciones con L=0**. Mecanismo: con `impact_on="output"`, `base` es la
+likelihood del output; cuando ninguna simulación reproduce la tupla, L=0 → `base=1e-9`
+→ todo impacto satura en 1.0 → empate → orden de código. Es la brújula apagada (D4)
+por otra puerta: el criterio por output es excelente cuando la respuesta ya está a la
+vista y ciego cuando no.
+
+**Híbrido (`impact_on="auto"`)**: output cuando L ≥ 0.05 (≥ ~20 simulaciones
+reproducen el output), prefijo si no. A/B en curso con las mismas semillas. Datos en
+`runs/ab_impact.json`.
 
 #### Integración al paquete (0.2.0)
 

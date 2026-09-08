@@ -118,8 +118,13 @@ class Engine:
         # likelihood del prefijo de decisiones creido (original); 'output' lo
         # mide sobre la likelihood del OUTPUT, que es lo que la regla de parada
         # certifica -- asi no se gasta en decisiones que no cambian la respuesta.
-        if impact_on not in ("prefix", "output"):
-            raise ValueError("impact_on must be 'prefix' or 'output'")
+        # 'auto': output cuando la likelihood ya es informativa (>= 0.05, o
+        # sea >= ~20 simulaciones reproducen el output), prefijo si no -- con
+        # L = 0 el criterio por output degenera (todo impacto satura en 1.0 y
+        # gana el orden de codigo), que es exactamente lo que se ve en las
+        # corridas con cientos de iteraciones en L = 0.
+        if impact_on not in ("prefix", "output", "auto"):
+            raise ValueError("impact_on must be 'prefix', 'output' or 'auto'")
         self.impact_on = impact_on
         self.verbose = verbose
         self.history: List[Snapshot] = []
@@ -272,7 +277,8 @@ class Engine:
                     draws, override=(s.key, lo), budget=self.nsims_impact)
                 l_plus, o_plus = self._run_simulations(
                     draws, override=(s.key, hi), budget=self.nsims_impact)
-                if self.impact_on == "output":
+                use_output = self.impact_on == "output" or (self.impact_on == "auto" and likelihood >= 0.05)
+                if use_output:
                     frac = lambda outs: (sum(1 for o in outs if o == target_output) / len(outs)) if outs else 0.0
                     lm, lp = frac(o_minus), frac(o_plus)
                     base_i = likelihood or 1e-9
