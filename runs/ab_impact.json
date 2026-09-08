@@ -73,7 +73,10 @@
    "ok_prefix": true,
    "ok_output": true,
    "L0_prefix": 0,
-   "L0_output": 3
+   "L0_output": 3,
+   "auto": 6260,
+   "ok_auto": true,
+   "L0_auto": 0
   },
   {
    "seed": 38,
@@ -94,7 +97,10 @@
    "ok_prefix": true,
    "ok_output": true,
    "L0_prefix": 0,
-   "L0_output": 131
+   "L0_output": 131,
+   "auto": 6395,
+   "ok_auto": true,
+   "L0_auto": 8
   }
  ],
  "auto": [
@@ -103,6 +109,18 @@
    "auto": 5995,
    "ok_auto": true,
    "L0_auto": 1
+  },
+  {
+   "seed": 31,
+   "auto": 6145,
+   "ok_auto": true,
+   "L0_auto": 2
+  },
+  {
+   "seed": 32,
+   "auto": 6770,
+   "ok_auto": true,
+   "L0_auto": 6
   },
   {
    "seed": 33,
@@ -129,10 +147,22 @@
    "L0_auto": 0
   },
   {
+   "seed": 37,
+   "auto": 6260,
+   "ok_auto": true,
+   "L0_auto": 0
+  },
+  {
    "seed": 38,
    "auto": 6045,
    "ok_auto": true,
    "L0_auto": 0
+  },
+  {
+   "seed": 39,
+   "auto": 6395,
+   "ok_auto": true,
+   "L0_auto": 8
   }
  ]
 }

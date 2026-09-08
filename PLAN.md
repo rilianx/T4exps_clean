@@ -1034,8 +1034,13 @@ por otra puerta: el criterio por output es excelente cuando la respuesta ya est�
 vista y ciego cuando no.
 
 **Híbrido (`impact_on="auto"`)**: output cuando L ≥ 0.05 (≥ ~20 simulaciones
-reproducen el output), prefijo si no. A/B en curso con las mismas semillas. Datos en
-`runs/ab_impact.json`.
+reproducen el output), prefijo si no. Mismas 10 semillas: **10/10 correctas**, 6382
+ejecuciones de media (5995–7420), **L0 máximo 8** (output puro: hasta 244).
+En las 8 parejas comparables: 6362 vs 7226 del prefijo (**-12%**),
+gana 7/8; contra output gana 4/8 — output es mejor cuando funciona y peor cuando se
+apaga; auto se queda con la estabilidad del prefijo y casi toda la ganancia. Speedup
+2.91× → 3.30×. Candidato a default en 0.3 (pendiente hasta cerrar la calibración,
+que corre con el default actual). Datos en `runs/ab_impact.json`.
 
 #### Integración al paquete (0.2.0)
 
