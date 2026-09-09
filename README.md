@@ -277,6 +277,18 @@ fewer executions than the sequential sweep, never losing the compass; the
 original engine's 6–89× speed-ups occurred only in runs that stopped on the
 wrong answer.
 
+**Calibration (0.3.0).** Randomising the *instance order* per replica — not the
+Monte Carlo seed, which leaves every replica looking at the same prefix — and
+testing the reported likelihoods as a Poisson-binomial (expected successes =
+Σ Lᵢ, since L is a lower bound on P(correct)): with `impact_on="prefix"` the
+engine got 4/8 where 6.59 were expected (P = 0.036, real overconfidence); with
+the 0.3 default `impact_on="auto"`, 6/8 against 6.60 expected (P = 0.42, no
+evidence of overconfidence). The miscalibration came from the selection policy
+stopping before it had explored, not from the posterior. Two candidate posterior
+fixes — `estimator="paired_t"` (tau² drawn from its inverse-χ² posterior) and
+`impute_prior="best"` — are implemented, tested and off by default: both measured
+*no effect* on BR.
+
 ---
 
 ## Repository layout

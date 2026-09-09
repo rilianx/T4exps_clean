@@ -1,0 +1,121 @@
+{
+ "ref": [
+  4.0,
+  2.0,
+  0.4,
+  0.01
+ ],
+ "levels": {
+  "0.8": {
+   "n": 8,
+   "correct": 6,
+   "rows": [
+    {
+     "order": 1,
+     "runs": 3045,
+     "L": 0.8,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 132
+    },
+    {
+     "order": 2,
+     "runs": 1890,
+     "L": 0.8,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 155
+    },
+    {
+     "order": 3,
+     "runs": 1300,
+     "L": 0.805,
+     "correct": false,
+     "output": [
+      4.0,
+      2.0,
+      0.3,
+      0.01
+     ],
+     "misses": 197
+    },
+    {
+     "order": 4,
+     "runs": 4425,
+     "L": 0.81,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 155
+    },
+    {
+     "order": 5,
+     "runs": 2925,
+     "L": 0.81,
+     "correct": false,
+     "output": [
+      4.0,
+      1.0,
+      0.4,
+      0.02
+     ],
+     "misses": 94
+    },
+    {
+     "order": 6,
+     "runs": 2555,
+     "L": 0.8325,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 25
+    },
+    {
+     "order": 7,
+     "runs": 2695,
+     "L": 0.845,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 0
+    },
+    {
+     "order": 8,
+     "runs": 3545,
+     "L": 0.8425,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 17
+    }
+   ]
+  }
+ },
+ "prefix": "replay_d5_best"
+}

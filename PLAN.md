@@ -1042,25 +1042,49 @@ Ninguno de los cuatro arreglos de 0.2 ni el híbrido `auto` tocan esto. La medid
 éxito ya está montada: repetir esta misma calibración y ver la fracción subir hasta la
 diagonal.
 
-#### D5: dos candidatos, calibración v2 (en curso)
+#### D5 resuelto: no era el posterior, era la política de selección
 
-`tau2` se estima *pooled* sobre 14 estrategias × instancias compartidas, así que sus
-grados de libertad son cientos y un posterior t apenas la ensancharía. El sospechoso
-fuerte es otro: **el prior de imputación está centrado en la media de los totales
-conocidos** — asume que lo no explorado es "promedio", y como el titular es la mejor
-conocida, la rama inexplorada casi siempre pierde en las simulaciones: L se infla a
-favor del camino explorado sin haberlo verificado.
+Hipótesis de partida (dos candidatos, ambos implementados y apagados por defecto):
+`PairedEstimatorT` (`"paired_t"`, `tau2` sorteado de su posterior inv-χ² con los df
+del bloque compartido) e `Engine(impute_prior="best")` (el prior de imputación
+centrado en el mejor total conocido en vez de la media, para que una rama no
+explorada no pierda por construcción).
 
-- `PairedEstimatorT` (`"paired_t"`): K3 con `tau2` sorteado por simulación de su
-  posterior inv-χ² con los df del bloque compartido.
-- `Engine(impute_prior="best")`: el prior se centra en el mejor total conocido — un
-  vecino no explorado es tan bueno como el líder hasta que se demuestre lo contrario.
+Experimento (`runs/launch_d5_prior.sh`): 8 órdenes aleatorios × {prior `best`, prior
+`mean`}, `confidence=0.8`, `impact_on="auto"` en ambos brazos para aislar el prior.
+Contraste con la tabla anterior, que usaba el default de 0.2 (`impact_on="prefix"`).
 
-Calibración v2 (`runs/launch_calib_v2.sh`): las tres combinaciones (t, best, t+best),
-mismos 8 órdenes × {0.8, 0.98}, `impact_on="auto"`, solver para lo no visto (la
-mayoría ya está en el oráculo). Éxito = la fracción correcta sube hacia la L
-reportada respecto de la tabla anterior (0.8: 0.50 / 0.98: 0.88). Con el ganador:
-default en 0.4 y paso 2, órdenes 9–16 (n=16 por umbral).
+Test correcto: los éxitos no son iid — cada réplica tiene su propia L reportada, así
+que lo que corresponde es una **Poisson-binomial** con `p_i = L_i` (la L es cota
+inferior de P(correcto), de modo que `sum(L_i)` son los aciertos esperados):
+
+| brazo | n | aciertos | esperados (Σ L) | P(X ≤ obs) | lectura |
+|---|---:|---:|---:|---:|---|
+| `prefix`/mean (default 0.2) | 8 | 4 | 6.59 | **0.036** | sobreconfianza real |
+| `auto`/mean (default 0.3) | 8 | 6 | 6.60 | 0.423 | sin evidencia |
+| `auto`/`best` | 8 | 6 | 6.54 | 0.442 | sin evidencia |
+
+**El prior no era la causa**: `best` y `mean` dan resultados idénticos (mismos runs,
+misma L) en 6 de los 8 órdenes. **La causa era `impact_on="prefix"`**: el motor
+paraba antes de explorar y certificaba sobre un prefijo no representativo. El arreglo
+ya estaba shippeado en 0.3.0 como mejora de la *selección*; que también arreglara la
+calibración no estaba previsto.
+
+Confirmación por el mecanismo, no sólo por el conteo: en el orden 3, en el punto
+donde el motor paró (~158 instancias por estrategia), la diferencia pareada
+γ=0.4 − γ=0.3 era **−0.0329** — con los datos que tenía, γ=0.3 ganaba de verdad, por
+casi 3× la tolerance; el cruce hacia γ=0.4 no se estabiliza hasta N≈306. El motor no
+fue sobreconfiado: certificó lo que sus datos decían, y erró en la proporción que su
+propia L admitía. Los órdenes tienen cruces muy dispares (N≈15 en o5 y o6, 34 en o4,
+306 en o3, 787 en o1), que es exactamente la variabilidad que la calibración con
+orden aleatorio existe para capturar.
+
+`paired_t` e `impute_prior="best"` quedan en el paquete, apagados y con test, pero
+**medidos como sin efecto en BR**: no son la respuesta a nada conocido hoy.
+
+Pendiente: la misma calibración a `confidence=0.98` con el default 0.3
+(`runs/launch_calib_auto.sh`), que es el nivel que se usa; con `prefix` daba 7/8
+contra 7.87 esperados (P=0.123, borde).
 
 #### A/B: impacto medido sobre el output vs sobre el prefijo
 
