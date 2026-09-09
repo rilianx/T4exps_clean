@@ -659,3 +659,8 @@ t_wall,strategy,theta,instance,family,value,seconds,status,detail
 74.4,bsg,a=4.0;b=2.0;g=0.3;p=0.02,/home/iaraya/T4exps/bsg_algo/BR15.txt -i 5 --min_fr=0.98 -t 30,BR15,94.889540,0.00,cache,
 74.4,bsg,a=4.0;b=2.0;g=0.3;p=0.02,/home/iaraya/T4exps/bsg_algo/BR11.txt -i 99 --min_fr=0.98 -t 30,BR11,94.448624,0.00,cache,
 74.7,bsg,a=4.0;b=2.0;g=0.3;p=0.02,/home/iaraya/T4exps/bsg_algo/BR12.txt -i 68 --min_fr=0.98 -t 30,BR12,94.496846,31.02,ok,
+104.5,bsg,a=4.0;b=2.0;g=0.3;p=0.02,/home/iaraya/T4exps/bsg_algo/BR1.txt -i 91 --min_fr=1.0 -t 30,BR1,95.094162,30.05,ok,
+104.8,bsg,a=4.0;b=2.0;g=0.3;p=0.02,/home/iaraya/T4exps/bsg_algo/BR2.txt -i 2 --min_fr=1.0 -t 30,BR2,95.695396,30.11,ok,
+104.8,bsg,a=4.0;b=2.0;g=0.3;p=0.02,/home/iaraya/T4exps/bsg_algo/BR10.txt -i 78 --min_fr=0.98 -t 30,BR10,95.218311,0.00,cache,
+135.0,bsg,a=4.0;b=2.0;g=0.3;p=0.02,/home/iaraya/T4exps/bsg_algo/BR7.txt -i 55 --min_fr=1.0 -t 30,BR7,95.997500,30.17,ok,
+135.9,bsg,a=4.0;b=2.0;g=0.3;p=0.02,/home/iaraya/T4exps/bsg_algo/BR14.txt -i 57 --min_fr=0.98 -t 30,BR14,94.548662,31.48,ok,

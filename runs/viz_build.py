@@ -161,6 +161,8 @@ cp_ = R / "calibration.json"
 d["calibration"] = json.loads(cp_.read_text()) if cp_.exists() else None
 abp_ = R / "ab_impact.json"
 d["ab_impact"] = json.loads(abp_.read_text()) if abp_.exists() else None
+cap_ = R / "calibration_arms.json"
+d["calibration_arms"] = json.loads(cap_.read_text()) if cap_.exists() else None
 crp_ = R / "calibration_random.json"
 d["calibration_random"] = json.loads(crp_.read_text()) if crp_.exists() else None
 

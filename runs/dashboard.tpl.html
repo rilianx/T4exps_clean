@@ -275,6 +275,20 @@ footer{border-top:1px solid var(--rule);padding-top:24px;
       <th class="n">correctas</th><th class="n">fracción</th><th class="n">L media al parar</th>
       <th class="n">runs medios</th><th class="n">speedup medio</th></tr></thead>
     <tbody></tbody></table></div>
+  <div id="cal-arms" hidden>
+    <p class="eyebrow" style="margin-top:22px">Órdenes aleatorios · test de Poisson-binomial · runs/calibration_arms.json</p>
+    <p style="font-size:13.5px;color:var(--ink-2);max-width:74ch;margin:0 0 12px">
+      Los éxitos no son iid: cada réplica reporta su propia likelihood, así que los
+      aciertos <em>esperados</em> son <code>Σ Lᵢ</code> y la cola izquierda
+      <code>P(X ≤ observados)</code> mide la sobreconfianza. Cada fila cambia una sola
+      cosa respecto de la de arriba.</p>
+    <div class="tablewrap"><table id="t-arms">
+      <thead><tr><th class="n">confidence</th><th>selección / prior</th><th class="n">n</th>
+        <th class="n">aciertos</th><th class="n">esperados (Σ L)</th><th class="n">P(X ≤ obs)</th>
+        <th class="n">runs medios</th><th>órdenes que fallan</th></tr></thead>
+      <tbody></tbody></table></div>
+    <p id="cap-arms" style="font-size:13.5px;color:var(--ink-3);max-width:74ch"></p>
+  </div>
   <div id="cal-random" hidden>
     <p class="eyebrow" style="margin-top:22px">Orden de instancias aleatorio por réplica · runs/calibration_random.json</p>
     <div class="readout" id="ro-calr"></div>
@@ -986,6 +1000,26 @@ function tipFor(host, tip) {
     `${okAll ? "Todas las corridas con impacto sobre el output paran en la referencia." : "<strong>Alguna corrida con impacto sobre el output paró en otra configuración.</strong>"} ` +
     `<strong>Bimodal:</strong> cuando la respuesta ya está a la vista el criterio por output ahorra ~20%; cuando ninguna simulación reproduce el output (L=0) su base es 1e-9, todo impacto satura en 1.0 y gana el orden de código — corridas con 57–244 iteraciones en L=0 y hasta 12 865 ejecuciones. ` +
     (hasAuto ? `<code>auto</code> usa output cuando L ≥ 0.05 y prefijo si no.` : `El híbrido <code>auto</code> (output si L ≥ 0.05, prefijo si no) está en curso.`);
+})();
+
+/* ---------- 1h. calibracion: brazos con Poisson-binomial ---------- */
+(function () {
+  const CA = DATA.calibration_arms, box = document.getElementById("cal-arms");
+  const arms = CA && CA.arms ? CA.arms.slice() : [];
+  if (!arms.length) return;
+  box.hidden = false;
+  arms.sort((a, b) => (a.level - b.level) || a.arm.localeCompare(b.arm));
+  document.querySelector("#t-arms tbody").innerHTML = arms.map(a => {
+    const bad = a.p_value < 0.05;
+    return `<tr class="${bad ? "tie" : ""}"><td class="n">${a.level}</td><td><code>${a.arm}</code></td>
+      <td class="n">${a.n}</td><td class="n">${a.correct}</td><td class="n">${a.expected.toFixed(2)}</td>
+      <td class="n">${a.p_value.toFixed(3)}${bad ? " ⚠" : ""}</td><td class="n">${a.runs.toFixed(0)}</td>
+      <td class="num">${a.wrong.join(", ") || "—"}</td></tr>`;
+  }).join("");
+  const bad = arms.filter(a => a.p_value < 0.05).map(a => `<code>${a.arm}</code> a ${a.level}`);
+  document.getElementById("cap-arms").innerHTML = bad.length
+    ? `Sobreconfianza detectable sólo en ${bad.join(", ")} (fila naranja). Cambiar la política de selección de <code>prefix</code> a <code>auto</code> la elimina; cambiar el prior de imputación de <code>mean</code> a <code>best</code> no cambia nada — de hecho da resultados idénticos en 6 de los 8 órdenes. <strong>La miscalibración estaba en la selección, no en el posterior.</strong>`
+    : `Ningún brazo muestra sobreconfianza detectable a este n.`;
 })();
 
 /* ---------- 1c. ablacion ---------- */

@@ -1,0 +1,491 @@
+{
+ "ref": [
+  4.0,
+  2.0,
+  0.4,
+  0.01
+ ],
+ "arms": [
+  {
+   "arm": "prefix / mean",
+   "level": 0.8,
+   "n": 8,
+   "correct": 4,
+   "expected": 6.595,
+   "p_value": 0.036396262006884374,
+   "runs": 3415.625,
+   "reals": 700.375,
+   "wrong": [
+    "o1",
+    "o3",
+    "o4",
+    "o5"
+   ],
+   "rows": [
+    {
+     "order": 1,
+     "runs": 4870,
+     "L": 0.84,
+     "correct": false,
+     "output": [
+      4.0,
+      2.0,
+      0.3,
+      0.01
+     ],
+     "misses": 270
+    },
+    {
+     "order": 2,
+     "runs": 2235,
+     "L": 0.8275,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 377
+    },
+    {
+     "order": 3,
+     "runs": 2100,
+     "L": 0.8025,
+     "correct": false,
+     "output": [
+      4.0,
+      2.0,
+      0.3,
+      0.01
+     ],
+     "misses": 0
+    },
+    {
+     "order": 4,
+     "runs": 3980,
+     "L": 0.805,
+     "correct": false,
+     "output": [
+      4.0,
+      2.0,
+      0.3,
+      0.01
+     ],
+     "misses": 1319
+    },
+    {
+     "order": 5,
+     "runs": 3895,
+     "L": 0.8275,
+     "correct": false,
+     "output": [
+      4.0,
+      1.0,
+      0.4,
+      0.02
+     ],
+     "misses": 1771
+    },
+    {
+     "order": 6,
+     "runs": 3780,
+     "L": 0.8125,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 842
+    },
+    {
+     "order": 7,
+     "runs": 2795,
+     "L": 0.86,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 712
+    },
+    {
+     "order": 8,
+     "runs": 3670,
+     "L": 0.82,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 312
+    }
+   ]
+  },
+  {
+   "arm": "auto / mean",
+   "level": 0.8,
+   "n": 8,
+   "correct": 6,
+   "expected": 6.595000000000001,
+   "p_value": 0.42330675000335494,
+   "runs": 2946.875,
+   "reals": 96.0,
+   "wrong": [
+    "o3",
+    "o5"
+   ],
+   "rows": [
+    {
+     "order": 1,
+     "runs": 3045,
+     "L": 0.8,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 132
+    },
+    {
+     "order": 2,
+     "runs": 2160,
+     "L": 0.855,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 148
+    },
+    {
+     "order": 3,
+     "runs": 2225,
+     "L": 0.8,
+     "correct": false,
+     "output": [
+      4.0,
+      2.0,
+      0.3,
+      0.01
+     ],
+     "misses": 197
+    },
+    {
+     "order": 4,
+     "runs": 4425,
+     "L": 0.81,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 155
+    },
+    {
+     "order": 5,
+     "runs": 2925,
+     "L": 0.81,
+     "correct": false,
+     "output": [
+      4.0,
+      1.0,
+      0.4,
+      0.02
+     ],
+     "misses": 94
+    },
+    {
+     "order": 6,
+     "runs": 2555,
+     "L": 0.8325,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 25
+    },
+    {
+     "order": 7,
+     "runs": 2695,
+     "L": 0.845,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 0
+    },
+    {
+     "order": 8,
+     "runs": 3545,
+     "L": 0.8425,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 17
+    }
+   ]
+  },
+  {
+   "arm": "auto / best",
+   "level": 0.8,
+   "n": 8,
+   "correct": 6,
+   "expected": 6.545,
+   "p_value": 0.4424780915483048,
+   "runs": 2797.5,
+   "reals": 96.875,
+   "wrong": [
+    "o3",
+    "o5"
+   ],
+   "rows": [
+    {
+     "order": 1,
+     "runs": 3045,
+     "L": 0.8,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 132
+    },
+    {
+     "order": 2,
+     "runs": 1890,
+     "L": 0.8,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 155
+    },
+    {
+     "order": 3,
+     "runs": 1300,
+     "L": 0.805,
+     "correct": false,
+     "output": [
+      4.0,
+      2.0,
+      0.3,
+      0.01
+     ],
+     "misses": 197
+    },
+    {
+     "order": 4,
+     "runs": 4425,
+     "L": 0.81,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 155
+    },
+    {
+     "order": 5,
+     "runs": 2925,
+     "L": 0.81,
+     "correct": false,
+     "output": [
+      4.0,
+      1.0,
+      0.4,
+      0.02
+     ],
+     "misses": 94
+    },
+    {
+     "order": 6,
+     "runs": 2555,
+     "L": 0.8325,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 25
+    },
+    {
+     "order": 7,
+     "runs": 2695,
+     "L": 0.845,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 0
+    },
+    {
+     "order": 8,
+     "runs": 3545,
+     "L": 0.8425,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 17
+    }
+   ]
+  },
+  {
+   "arm": "prefix / mean",
+   "level": 0.98,
+   "n": 8,
+   "correct": 7,
+   "expected": 7.87,
+   "p_value": 0.1228700527700245,
+   "runs": 6870.0,
+   "reals": 888.0,
+   "wrong": [
+    "o3"
+   ],
+   "rows": [
+    {
+     "order": 1,
+     "runs": 7460,
+     "L": 0.9875,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 233
+    },
+    {
+     "order": 2,
+     "runs": 7405,
+     "L": 0.985,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 600
+    },
+    {
+     "order": 3,
+     "runs": 4425,
+     "L": 0.9875,
+     "correct": false,
+     "output": [
+      4.0,
+      2.0,
+      0.3,
+      0.01
+     ],
+     "misses": 0
+    },
+    {
+     "order": 4,
+     "runs": 6050,
+     "L": 0.9825,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 1175
+    },
+    {
+     "order": 5,
+     "runs": 10290,
+     "L": 0.9825,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 2833
+    },
+    {
+     "order": 6,
+     "runs": 7655,
+     "L": 0.98,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 842
+    },
+    {
+     "order": 7,
+     "runs": 5435,
+     "L": 0.985,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 986
+    },
+    {
+     "order": 8,
+     "runs": 6240,
+     "L": 0.98,
+     "correct": true,
+     "output": [
+      4.0,
+      2.0,
+      0.4,
+      0.01
+     ],
+     "misses": 435
+    }
+   ]
+  }
+ ]
+}
