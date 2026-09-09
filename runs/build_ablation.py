@@ -31,7 +31,7 @@ rows = []
 for f in sorted(glob.glob(os.path.join(HERE, "stage3_replay_*_result.json")) + glob.glob(os.path.join(HERE, "stage3_var_*_result.json"))):
     d = json.load(open(f)); tag = re.sub(r"^stage3_(replay_)?|_result\.json$", "", os.path.basename(f))
     if tag.startswith("var_orig_"): continue
-    if any(tag.startswith(x) for x in ("calr_","calv2_","calv3_","cal_","ab_out_","ab_auto_","regress","smoke")): continue   # calibracion: otro orden/umbral, no va a la tabla        # el motor original quedo descartado; sus 20 semillas no van a la tabla
+    if any(tag.startswith(x) for x in ("calr_","calv2_","calv3_","cal_","d5_","ab_out_","ab_auto_","regress","smoke")): continue   # calibracion: otro orden/umbral, no va a la tabla        # el motor original quedo descartado; sus 20 semillas no van a la tabla
     m = re.search(r"_s(\d+)$", tag)
     rows.append(dict(tag=tag, denominador=cell_of(d), estimador=estimator_label(d),
                      seed=int(m.group(1)) if m else 0, runs=d["runs"], speedup=round(d["speedup"], 2),
