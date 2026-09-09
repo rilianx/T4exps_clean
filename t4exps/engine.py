@@ -81,6 +81,7 @@ class Engine:
         impute_prior_scale: float = 1.0,
         nsims_confirm: int | None = None,
         impact_on: str = "auto",
+        impute_prior: str = "mean",
     ):
         self.experiment = experiment
         instances = order_instances(instances, instance_order, family, seed)
@@ -128,6 +129,16 @@ class Engine:
         if impact_on not in ("prefix", "output", "auto"):
             raise ValueError("impact_on must be 'prefix', 'output' or 'auto'")
         self.impact_on = impact_on
+        # impute_prior: centro del prior para una estrategia SIN datos.
+        # 'mean' (0.2/0.3): la media de los totales conocidos -- asume que lo no
+        # explorado es promedio, y como el titular es la mejor conocida, la rama
+        # inexplorada casi siempre pierde en las simulaciones: L se infla sin
+        # haberla verificado (candidato a D5).  'best': el mejor total conocido
+        # -- un vecino no explorado es tan bueno como el lider hasta que se
+        # demuestre lo contrario; fuerza a explorar antes de certificar.
+        if impute_prior not in ("mean", "best"):
+            raise ValueError("impute_prior must be 'mean' or 'best'")
+        self.impute_prior = impute_prior
         self.verbose = verbose
         self.history: List[Snapshot] = []
         self._path_runs = 0
@@ -199,7 +210,7 @@ class Engine:
                 sums[override[0]] = override[1]
             if self.impute_missing:
                 col = draws.sums[:, sim]
-                mu = float(col.mean())
+                mu = float(col.max() if self.impute_prior == "best" else col.mean())
                 sd = float(col.std()) if col.size > 1 else 0.0
                 sums = _ImputingSums(sums, np.random.default_rng(self.seed * 100003 + sim),
                                      mu, max(sd * self.impute_prior_scale, 1e-9))

@@ -245,6 +245,7 @@ class PairedEstimatorK2(PairedEstimatorLegacy):
 
 
 class PairedEstimatorK3(PairedEstimatorK2):
+    tau2_posterior = False                  # True en PairedEstimatorT
     """The paired estimator.  Levels from the shared block (k >= 2), instance
     effects as shrunken residuals against those levels, residual variance by
     two-way ANOVA.  Fixes both defects of the legacy version.
@@ -265,6 +266,7 @@ class PairedEstimatorK3(PairedEstimatorK2):
         v_b_raw = float(np.var(raw_b[inform]))
         inv_k = float(np.mean(1.0 / k[inform]))
         s_b2 = max(v_b_raw - s_e2 * inv_k, 0.0)
+        self._last_df = max(df, 1.0)             # para PairedEstimatorT
         return s_b2, s_e2
 
     def draws(self, evals, n_instances, nsims, rng) -> Draws:
@@ -290,8 +292,11 @@ class PairedEstimatorK3(PairedEstimatorK2):
         lam = np.zeros(n); lam[seen] = s_b2 / (s_b2 + s_e2 / k[seen])
         b_hat = np.where(seen, np.nan_to_num(raw_b) * lam, np.nan)
         tau2 = max(s_e2, 1e-12); known = np.isfinite(b_hat); b_sd = float(np.sqrt(s_b2))
+        df = getattr(self, "_last_df", 1.0)
         out = np.empty((m, nsims))
         for sim in range(nsims):
+            if self.tau2_posterior:              # posterior t: tau2 | datos ~ df*s_e2 / chi2(df)
+                tau2 = max(df * s_e2 / rng.chisquare(df), 1e-12)
             b = np.empty(n); b[known] = b_hat[known]
             nu = int((~known).sum())
             if nu: b[~known] = rng.standard_normal(nu) * b_sd
@@ -305,11 +310,22 @@ class PairedEstimatorK3(PairedEstimatorK2):
         return Draws(keys, out)
 
 
+class PairedEstimatorT(PairedEstimatorK3):
+    """K3 con incertidumbre en tau2: en cada simulacion tau2 se sortea de su
+    posterior escalado inv-chi2 con los grados de libertad del bloque
+    compartido, asi que el nivel y la extrapolacion siguen una t en vez de una
+    normal con tau2 plug-in.  Candidato para D5 (sobreconfianza a umbrales
+    intermedios en la calibracion con ordenes aleatorios)."""
+    name = "paired_t"
+    tau2_posterior = True
+
+
 PairedEstimator = PairedEstimatorK3          # the default "paired"
 
 ESTIMATORS = {
     "paired": PairedEstimatorK3,
     "paired_k3": PairedEstimatorK3,
+    "paired_t": PairedEstimatorT,
     "paired_k2": PairedEstimatorK2,
     "paired_legacy": PairedEstimatorLegacy,
     "independent": IndependentEstimator,

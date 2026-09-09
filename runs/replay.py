@@ -41,6 +41,7 @@ p.add_argument("--estimator", default="paired_legacy",
 p.add_argument("--impute", action="store_true",
                help="estrategias sin datos se imputan del prior en vez de abortar (implica honesto)")
 p.add_argument("--impute-scale", type=float, default=1.0, help="ancho del prior de imputacion (x sd)")
+p.add_argument("--impute-prior", default="mean", choices=["mean","best"])
 p.add_argument("--nsims-confirm", type=int, default=None, help="re-estimar la likelihood con N sims cerca del umbral")
 p.add_argument("--impact-on", default="auto", choices=["prefix","output","auto"], help="default auto (0.3); prefix reproduce los replays de 0.2")
 p.add_argument("--honest", action="store_true",
@@ -55,6 +56,7 @@ if a.limit:
 eng = Engine(make_experiment(30), inst, estimator=a.estimator, n_jobs=1,
              honest_likelihood=(a.honest or a.impute), impute_missing=a.impute,
              impute_prior_scale=a.impute_scale, nsims_confirm=a.nsims_confirm, impact_on=a.impact_on,
+             impute_prior=a.impute_prior,
              confidence=a.confidence, tolerance=a.tolerance, nsims=a.nsims,
              nruns=a.nruns, batch=a.batch, instance_order="file",
              seed=a.seed, verbose=True, timeout=75)
@@ -78,7 +80,7 @@ print(f"  cache hits={r.hits}  misses={r.misses}  (solver real: {'si' if a.allow
     "tag": a.tag, "output": list(res.output), "likelihood": res.likelihood, "runs": res.runs,
     "sequential_runs": res.sequential_runs, "speedup": res.speedup, "wasted_runs": res.wasted_runs,
     "hits": r.hits, "misses": r.misses, "confidence": a.confidence, "tolerance": a.tolerance,
-    "nsims": a.nsims, "nsims_confirm": a.nsims_confirm, "impact_on": a.impact_on, "order_seed": a.order_seed, "impute_scale": a.impute_scale, "seed": a.seed, "oracle": a.oracle,
+    "nsims": a.nsims, "nsims_confirm": a.nsims_confirm, "impact_on": a.impact_on, "impute_prior": a.impute_prior, "order_seed": a.order_seed, "impute_scale": a.impute_scale, "seed": a.seed, "oracle": a.oracle,
     "honest": a.honest or a.impute, "impute": a.impute, "estimator": a.estimator,
     "estimator_class": type(eng.estimator).__name__, "t4exps_version": t4exps.__version__,
     "history": [[s.runs, s.likelihood, s.state_depth, s.alive] for s in res.history]}, indent=1))
