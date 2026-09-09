@@ -1042,6 +1042,26 @@ Ninguno de los cuatro arreglos de 0.2 ni el híbrido `auto` tocan esto. La medid
 éxito ya está montada: repetir esta misma calibración y ver la fracción subir hasta la
 diagonal.
 
+#### D5: dos candidatos, calibración v2 (en curso)
+
+`tau2` se estima *pooled* sobre 14 estrategias × instancias compartidas, así que sus
+grados de libertad son cientos y un posterior t apenas la ensancharía. El sospechoso
+fuerte es otro: **el prior de imputación está centrado en la media de los totales
+conocidos** — asume que lo no explorado es "promedio", y como el titular es la mejor
+conocida, la rama inexplorada casi siempre pierde en las simulaciones: L se infla a
+favor del camino explorado sin haberlo verificado.
+
+- `PairedEstimatorT` (`"paired_t"`): K3 con `tau2` sorteado por simulación de su
+  posterior inv-χ² con los df del bloque compartido.
+- `Engine(impute_prior="best")`: el prior se centra en el mejor total conocido — un
+  vecino no explorado es tan bueno como el líder hasta que se demuestre lo contrario.
+
+Calibración v2 (`runs/launch_calib_v2.sh`): las tres combinaciones (t, best, t+best),
+mismos 8 órdenes × {0.8, 0.98}, `impact_on="auto"`, solver para lo no visto (la
+mayoría ya está en el oráculo). Éxito = la fracción correcta sube hacia la L
+reportada respecto de la tabla anterior (0.8: 0.50 / 0.98: 0.88). Con el ganador:
+default en 0.4 y paso 2, órdenes 9–16 (n=16 por umbral).
+
 #### A/B: impacto medido sobre el output vs sobre el prefijo
 
 `Engine(impact_on="output")`: el impacto de una estrategia se mide sobre la
