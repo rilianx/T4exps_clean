@@ -1082,9 +1082,36 @@ orden aleatorio existe para capturar.
 `paired_t` e `impute_prior="best"` quedan en el paquete, apagados y con test, pero
 **medidos como sin efecto en BR**: no son la respuesta a nada conocido hoy.
 
-Pendiente: la misma calibración a `confidence=0.98` con el default 0.3
-(`runs/launch_calib_auto.sh`), que es el nivel que se usa; con `prefix` daba 7/8
-contra 7.87 esperados (P=0.123, borde).
+#### El mismo contraste a `confidence=0.98`
+
+`runs/launch_calib_auto.sh`, mismos 8 órdenes. **Empate en corrección: 7/8 los dos**
+(7.87 esperados; P=0.123 con `prefix`, 0.127 con `auto`). El único fallo en ambos es
+el orden 3. Es decir: a umbral alto la política de selección **no cambia la
+calibración** — la mejora de 4/8 → 6/8 que se ve a 0.8 es específica de umbrales
+intermedios, donde parar temprano sin explorar es una opción real.
+
+Lo que sí cambia es el costo, y de forma asimétrica:
+
+| | `prefix` | `auto` |
+|---|---:|---:|
+| correctas | 7/8 | 7/8 |
+| mediana de ejecuciones | 6822 | **5762 (−16%)** |
+| media | 6870 | 6950 (+1%) |
+| gana en | — | **6 de 8 órdenes** |
+
+`auto` es mejor en el caso típico pero tiene **cola pesada**: en el orden 5 costó
+17 920 contra 10 290 (+74%), y ese único caso se lleva toda la ganancia de la media.
+No es la brújula apagada — en o5 `auto` nunca toca L=0 (0 iteraciones contra 1 de
+`prefix`), y ambos recorren las mismas 41 estrategias; simplemente explora más a
+fondo, 698 iteraciones contra 388. Reportar mediana y tasa de victorias, no la media.
+
+**Conclusión sobre `auto` como default:** se sostiene (mejor mediana, gana 6/8,
+arregla la calibración a umbrales intermedios), con la salvedad honesta de que su
+distribución de costo tiene cola y que a 0.98 no mejora la corrección.
+
+Nota metodológica: las "evaluaciones reales" no son comparables entre rondas — el
+oráculo creció de ~24 000 a ~29 900 pares en el medio, así que las corridas tardías
+pagan menos solver por el mismo trabajo.
 
 #### A/B: impacto medido sobre el output vs sobre el prefijo
 
